@@ -1,0 +1,218 @@
+:root {
+  --primary: #d81e5b;
+  --secondary: #8c38ff;
+  --dark: #131a26;
+  --light: #eee;
+}
+
+*, 
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family:'Courier New', Courier, monospace;
+}
+
+body {
+  background-color: var(--light);
+}
+
+button {
+  appearance: none;
+  border: none;
+  outline: none;
+  color: #fff;
+  background-color: inherit;
+  font-size: 20px;
+  padding: 16px;
+  cursor: pointer;
+  transition: 0.4s;
+}
+
+button:hover {
+	filter: brightness(90%);
+}
+
+.app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.calculator {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--dark);
+  color: var(--light);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 64px rgba(0, 0, 0, 0.2);
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 16px;
+  background-color: var(--light);
+  color: var(--dark);
+}
+
+.history #head {
+  display: flex;
+  flex-direction: row;
+  align-items: middle;
+  width: 100%;
+  background-color: var(--light);
+  color: var(--dark);
+  margin-bottom: 10px;
+}
+
+.history #head h3 {
+  font-size: 16px;
+  flex-grow: 2;
+}
+
+.history #head p {
+  cursor: pointer;
+}
+
+.history #main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 130px;
+  overflow: auto;
+}
+
+.history.open {
+  display: block;
+}
+
+.history.closed {
+  display: none;
+}
+
+.expression-result {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.expression-result p {
+  align-self: flex-end;
+}
+
+#menu {
+  align-self: flex-end;
+  background: inherit;
+}
+
+#long-button {
+  color: inherit;
+  padding: 10px;
+}
+
+#long-menu {
+  font-family: inherit;
+}
+
+.display {
+  padding: 10px 16px;
+  text-align: right;
+  background-color: var(--dark);
+  color: var(--light);
+  font-size: 24px;
+  font-weight: 300;
+  height: 75px;
+}
+
+.display p {
+  color: #888;
+  width: 100%;
+  max-width: 100%;
+  overflow: auto;
+  margin: 0;
+}
+
+.scientific {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.scientific button:hover {
+  background-color: var(--secondary);
+}
+
+.alwaysVisible {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.alwaysVisible button {
+  flex: 1 1 auto;
+  background-color: inherit;
+  color: inherit;
+}
+
+.drawer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+
+.switchButtons {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.switchButtons button {
+  flex: 2 1 auto;
+}
+
+.invertible {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.invertible button {
+  flex: 1 2 25%;  
+}
+
+.standard {
+  display: flex;
+  flex-direction: row;
+}
+
+.operators {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  background-color: var(--secondary);
+}
+
+.operators button {
+  flex: 2 1 33.334%;
+  font-weight: 700;
+}
+
+.digits {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  background-color: var(--primary);
+}
+
+.digits button {
+  flex: 1 33.334%;
+}
