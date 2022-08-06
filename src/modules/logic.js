@@ -25,24 +25,29 @@ export function useDisplayUpdate(initialValue) {
 	const [display, updateDisplay] = useState(initialValue);
 
 	useEffect(() => {
-		updateDisplay(prevState => ({
-			...prevState,
-			expression: '',
-			stack: [],
-			result: '',
-			previous: '',
-            history: [],
-			isDegree: true,
-			isInverted: false,
-		}))
+		updateDisplay(function(prevState) {
+            console.log(prevState);
+            return {
+                ...prevState,
+                expression: '',
+                stack: [],
+                result: '',
+                previous: '',
+                history: [],
+                isDegree: true,
+                isInverted: false,
+		    };
+        });
 	}, [])
 	
     const handleAddExpression = useCallback((expression) => {
-        updateDisplay(prevState => ({
-            ...prevState,
-            expression: prevState.expression + expression,
-            result: math.evaluate(prevState.expression + expression).toString(), 
-        }))
+        updateDisplay(function(prevState) {
+            return {
+                ...prevState,
+                expression: prevState.expression + expression,
+                result: math.evaluate(prevState.expression + expression).toString(), 
+            };
+        });
     }, []);
 
 	const handleAddDigit = useCallback((value) => {
@@ -64,10 +69,12 @@ export function useDisplayUpdate(initialValue) {
 		if (invalid) {
 			return;
 		} else {
-			updateDisplay(prevState => ({
-				...prevState,
-				expression: prevState.expression + value,
-			}));
+			updateDisplay(function(prevState) {
+                return {
+                    ...prevState,
+                    expression: prevState.expression + value,
+                };
+            });
 		}
 	}, [display.expression]);
 
@@ -92,13 +99,14 @@ export function useDisplayUpdate(initialValue) {
         !digits.includes(Number.parseInt(display.expression.slice(-1)))) {
 			value = '';
 		} 
-		updateDisplay(prevState => ({
-			...prevState,
-			expression: prevState.expression + value,
-			result: evaluateWithNewValue(prevState.expression, 
-				value, prevState.stack.length),
-		}));
-		
+		updateDisplay(function(prevState) {
+            return {
+                ...prevState,
+                expression: prevState.expression + value,
+                result: evaluateWithNewValue(prevState.expression, 
+                    value, prevState.stack.length),
+            };
+        });
 	}, [display.expression]);
 
 	const handleAddParenthesis = useCallback((value) => {
@@ -192,10 +200,13 @@ export function useDisplayUpdate(initialValue) {
     }, [display.expression, display.previous]);
 
     const handleResetCalculator = useCallback(() => {
-        updateDisplay({
-            expression: '',
-            result: '',
-            stack: [],
+        updateDisplay(function(prevState) {
+            return {
+                ...prevState,
+                expression: '',
+                result: '',
+                stack: [],
+            }
         });
     }, []);
 
@@ -206,15 +217,21 @@ export function useDisplayUpdate(initialValue) {
     }, []);
 
     const handleToggleDegree = useCallback(() => {
-        updateDisplay(prevState => ({
-            isDegree: !prevState.isDegree,
-        }));
+        updateDisplay(function(prevState) {
+            return {
+                ...prevState,
+                isDegree: !prevState.isDegree,
+            }
+        });
     }, []);
 
     const handleToggleInverted = useCallback(() => {
-        updateDisplay(prevState => ({
-            isInverted: !prevState.isInverted,
-        }));
+        updateDisplay(function(prevState) {
+            return {
+                ...prevState,
+                isInverted: !prevState.isInverted,
+            }
+        });
     }, []);
 
 	return {
