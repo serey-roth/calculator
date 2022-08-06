@@ -1,44 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 const math = require('mathjs');
 
-const ops = ['+', '-', '*', '/', '.', '^', '%'];
+const binaryOps = ['+', '-', '*', '/', '.', '^', '%'];
+const unaryFns = ['sqrt', 'exp', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
+'log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 export const digits = Array.from(Array(9), (_, d) => d + 1);
-
-function fillInClosingParen(currentExpr, stackLength) {
-    for (let i = 0; i < stackLength; i++) {
-        currentExpr += ')';
-    }
-    return currentExpr;
-}
-
-function evaluateWithNewValue(currentExpr, newValue, stackLength) {
-	if (digits.includes(Number.parseInt(newValue)) || 
-    newValue === ')' 
-    || newValue === "") {
-		return math.evaluate(fillInClosingParen(currentExpr + newValue, stackLength)).toString();
-	}	
-	return '';
-}
 
 export function useDisplayUpdate(initialValue) {
 	const [display, updateDisplay] = useState(initialValue);
-
-	useEffect(() => {
-		updateDisplay(function(prevState) {
-            console.log(prevState);
-            return {
-                ...prevState,
-                expression: '',
-                stack: [],
-                result: '',
-                previous: '',
-                history: [],
-                isDegree: true,
-                isInverted: false,
-		    };
-        });
-	}, [])
 	
     const handleAddExpression = useCallback((expression) => {
         updateDisplay(function(prevState) {
@@ -63,43 +33,54 @@ export function useDisplayUpdate(initialValue) {
     }, []);
 
 	const handleAddBinaryOperator = useCallback((value) => {
-		const invalid = (display.expression === '' || 
-						ops.includes(display.expression.slice(-1)) || 
-						display.expression.slice(-1) === '(');
-		if (invalid) {
-			return;
-		} else {
-			updateDisplay(function(prevState) {
+		updateDisplay(function(prevState) {
+            const invalid = (prevState.expression === '' || 
+						binaryOps.includes(prevState.expression.slice(-1)) || 
+						prevState.expression.slice(-1) === '(');
+            if (invalid) {
+                return;
+            } else {
                 return {
                     ...prevState,
                     expression: prevState.expression + value,
                 };
-            });
-		}
-	}, [display.expression]);
+            }
+        });
+	}, []);
 
 	const handleAddUnaryOperator = useCallback((value) => {
 		updateDisplay(function(prevState) {
-            console.log(prevState);
-            let newStack = (prevState.stack.length === 0) ? 
-            [1] : 
-            [...prevState.stack, 1];
-            return {
-                ...prevState,
-                expression: prevState.expression + value + '(',
-                stack: [...newStack],
-            };
+            if (value === '^2' || value === '!')  {
+                if (digits.includes(prevState.expression.slice(-1))) {
+                    return {
+                        ...prevState,
+                        expression: prevState.expression + value,
+                        result: evaluateWithNewValue(prevState.expression, 
+                            value, prevState.stack.length),
+                    };
+                } else {
+                    return;
+                }
+            } else {
+                let newStack = (prevState.stack.length === 0) ? 
+                                [1] : [...prevState.stack, 1];
+                return {
+                    ...prevState,
+                    expression: prevState.expression + value + '(',
+                    stack: newStack,
+                };
+            }
         });
 	}, []);
 
 	const handleAddSpecial = useCallback(value => {
-		if (value === 'pi') {
-			value = math.pi;
-		} else if (value === '!' && 
-        !digits.includes(Number.parseInt(display.expression.slice(-1)))) {
-			value = '';
-		} 
 		updateDisplay(function(prevState) {
+            if (value === 'pi') {
+                value = math.pi;
+            } else if (value === '!' && 
+            !digits.includes(Number.parseInt(prevState.expression.slice(-1)))) {
+                value = '';
+            } 
             return {
                 ...prevState,
                 expression: prevState.expression + value,
@@ -107,97 +88,84 @@ export function useDisplayUpdate(initialValue) {
                     value, prevState.stack.length),
             };
         });
-	}, [display.expression]);
+	}, []);
 
 	const handleAddParenthesis = useCallback((value) => {
-		if (value === '(') {
-			const conditionOpen = display.expression === '' || 
-								digits.includes(Number.parseInt(display.expression.slice(-1))) ||
-								display.expression.slice(-1) === '(' ||
-								(display.expression.slice(-1) === ')' && display.stack.length === 0) ||
-								(ops.includes(display.expression.slice(-1)));
-			if (conditionOpen) {
-				updateDisplay(function(prevState) {
-                    console.log(prevState);
-                    let newState = {
-                        ...prevState,
-                        expression: prevState.expression + value,
-                        stack: [...prevState.stack, 1],
-                        result: evaluateWithNewValue(prevState.expression,
-                            value, prevState.stack.length + 1),
-                    };
-                    console.log(newState);
-                    return newState;
-                });
-			} else {
-				return;
-			}
-		} else {
-			const conditionClose = digits.includes(Number.parseInt(display.expression.slice(-1))) || 
-								display.stack.length > 0;
-			if (conditionClose) {
-                updateDisplay(function(prevState) {
-                    console.log(prevState);
-                    let newState = {
-                        ...prevState,
-                        expression: prevState.expression + value,
-                        stack: prevState.stack.filter((_, i) => i < prevState.stack.length - 1),
-                        result: evaluateWithNewValue(prevState.expression,
-                            value, prevState.stack.length - 1),
-                    };
-                    console.log(newState);
-                    return newState;
-                });
-			} else {
-				return;
-			}
-		}
-	}, [display.expression, display.stack]);
+        updateDisplay(function(prevState) {
+            const conditionOpen = prevState.expression === '' || 
+				digits.includes(Number.parseInt(prevState.expression.slice(-1))) ||
+				prevState.expression.slice(-1) === '(' ||
+			    (prevState.expression.slice(-1) === ')' && prevState.stack.length === 0) ||
+				(binaryOps.includes(prevState.expression.slice(-1)));
+            const conditionClose = digits.includes(Number.parseInt(prevState.expression.slice(-1))) || 
+				prevState.stack.length > 0;
+            if (value === '(' && conditionOpen) {
+                let newState = {
+                    ...prevState,
+                    expression: prevState.expression + value,
+                    stack: [...prevState.stack, 1],
+                    result: evaluateWithNewValue(prevState.expression,
+                        value, prevState.stack.length + 1),
+                };
+                return newState;
+            } else if (value === ')' && conditionClose) {
+                let newState = {
+                    ...prevState,
+                    expression: prevState.expression + value,
+                    stack: prevState.stack.filter((_, i) => i < prevState.stack.length - 1),
+                    result: evaluateWithNewValue(prevState.expression,
+                        value, prevState.stack.length - 1),
+                };
+                return newState;
+            } else {
+                return;
+            }
+        });
+	}, []);
 	
     const handleCalculation = useCallback(() => {
-        if (display.expression !== '' && !ops.includes(display.expression.slice(-1))) {
-            updateDisplay(function(prevState) {
+        updateDisplay(function(prevState) {
+            if (prevState.expression !== '' && !binaryOps.includes(prevState.expression.slice(-1))) {
                 let expr = fillInClosingParen(prevState.expression, prevState.stack.length);
-                let res = evaluateWithNewValue(prevState.expression, '', 
+                let res = evaluateWithNewValue(prevState.expression, 'calculate', 
                 prevState.stack.length);
+                let newHistory = prevState.history.length === 0 ? 
+                                [{
+                                    expression: expr,
+                                    result: res,
+                                }] : 
+                                [...prevState.history, 
+                                {
+                                    expression: expr,
+                                    result: res,
+                                }
+                                ];
                 let newState = {
                     ...prevState,
                     expression: res,
                     previous: expr,
-                    history: [...prevState.history, {
-                        expression: expr,
-                        result: res,
-                    }], 
+                    history: newHistory, 
                     result: res,
                 };
                 console.log(newState);
                 return newState;
-            });
-        }
-    }, [display.expression]);
+            }
+        });
+    }, []);
 
     const handleDeleteLast = useCallback((value) => {
-        let expr = display.previous !== '' ? display.previous : display.expression;
-        if (expr.slice(-1) === ')') {
-            updateDisplay(prevState => ({
+        updateDisplay(function(prevState) {
+            let expr = prevState.previous !== '' ? prevState.previous : prevState.expression;
+            let [newExpr, newStack] = removePreviousValue(expr, prevState.stack);
+            return {
                 ...prevState,
-                expression: prevState.expression.slice(0, -1),
-                stack: [...prevState.stack, 1],
-                result: evaluateWithNewValue(prevState.expression.slice(0, -1), '', 
-                prevState.stack.length + 1),
+                expression: newExpr,
+                stack: newStack,
+                result: evaluateWithNewValue(newExpr, 'deleteLast', newStack.length),
                 previous: '',
-            }));
-        } else if (expr.slice(-1) === '(') {
-            updateDisplay(prevState => ({
-                ...prevState,
-                expression: prevState.expression.slice(0, -1),
-                stack: prevState.stack.filter((_, i) => i < prevState.stack.length),
-                result: evaluateWithNewValue(prevState.expression.slice(0, -1), '', 
-                prevState.stack.length - 1),
-                previous: '',
-            }));
-        }
-    }, [display.expression, display.previous]);
+            }
+        });
+    }, []);
 
     const handleResetCalculator = useCallback(() => {
         updateDisplay(function(prevState) {
@@ -249,4 +217,40 @@ export function useDisplayUpdate(initialValue) {
         handleToggleInverted,
         handleDeleteLast
 	};
+}
+
+function fillInClosingParen(currentExpr, stackLength) {
+    for (let i = 0; i < stackLength; i++) {
+        currentExpr += ')';
+    }
+    return currentExpr;
+}
+
+function evaluateWithNewValue(currentExpr, newValue, stackLength) {
+	if (digits.includes(Number.parseInt(newValue)) || 
+    newValue === ')') {
+		return math.evaluate(fillInClosingParen(currentExpr + newValue, 
+            stackLength)).toString();
+	} else if (newValue === "calculate") {
+        return math.evaluate(fillInClosingParen(currentExpr, stackLength)).toString();
+    }
+	return '';
+}
+
+function removePreviousValue(currentExpr, currentStack) {
+    const regex = new RegExp(`(${unaryFns.join('|')})$`, 'gi');
+    let lastValue = currentExpr.slice(-1);
+    let newExpr = currentExpr.slice(0, -1);
+    let newStack = null;
+    if (lastValue.slice(-1) === ')') {
+        newStack = currentStack.length === 0 ? [1] : [...currentStack, 1];
+    } else if (lastValue.slice(-1) === '(') {
+        if (regex.test(newExpr)) {
+            newExpr = newExpr.replace(regex, '');
+        }
+        newStack = currentStack.filter((_, i) => i < currentStack.length - 1);
+    } else {
+        newStack = currentStack.map(i => i);
+    }
+    return [newExpr, newStack];
 }

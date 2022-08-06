@@ -7,8 +7,8 @@ import { useDisplayUpdate, digits } from './modules/logic';
 
 function App() {
 	const special = ['pi', 'e', '!'];
-	const unaryOps = ['exp', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
-	const unaryOpsInv = ['log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
+	const unaryOps = ['sqrt', 'exp', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
+	const unaryOpsInv = ['^2', 'log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 	const menuOptions = ['None', 'History'];
 
 	const {
@@ -27,12 +27,12 @@ function App() {
         handleDeleteLast
 	} = useDisplayUpdate({
 		expression: '',
-		stack: [],
-		result: '',
-		previous: '',
+        stack: [],
+        result: '',
+        previous: '',
         history: [],
-		isDegree: true,
-		isInverted: false,
+        isDegree: true,
+        isInverted: false,
 	});
 
 	const [historyVisible, setHistoryVisible] = useState(false);
@@ -110,6 +110,7 @@ function App() {
 						<button onClick={() => handleAddBinaryOperator("/")}>&divide;</button>
 						<button onClick={() => handleAddParenthesis('(')}>(</button>
 						<button onClick={() => handleAddParenthesis(')')}>)</button>
+						<button onClick={() => handleAddBinaryOperator('^')}>^</button>
 						<button onClick={() => handleAddBinaryOperator('%')}>mod</button>
 						<button onClick={handleCalculation}>=</button>
 						<button onClick={handleResetCalculator}>AC</button>
