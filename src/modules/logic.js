@@ -7,25 +7,27 @@ const unaryFns = ['sqrt', 'exp', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
 'log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 export const digits = Array.from(Array(9), (_, d) => d + 1);
 
-export function useDisplayUpdate(initialValue) {
-	const [display, updateDisplay] = useState(initialValue);
+export function useCalculator(initialValue) {
+	const [calc, updateCalc] = useState(initialValue);
 	
     const handleAddExpression = useCallback((expression) => {
-        updateDisplay(function(prevState) {
+        updateCalc(function(prevState) {
             return {
                 ...prevState,
                 expression: prevState.expression + expression,
+                forDisplay: prevState.forDisplay + expression,
                 result: math.evaluate(prevState.expression + expression).toString(), 
             };
         });
     }, []);
 
 	const handleAddDigit = useCallback((value) => {
-		updateDisplay(function(prevState) {
+		updateCalc(function(prevState) {
             console.log(prevState);
             return {
 			...prevState,
 			expression: prevState.expression + value,
+            forDisplay: prevState.forDisplay + value,
 			result: evaluateWithNewValue(prevState.expression, 
 				value, prevState.stack.length),
 		    };
@@ -33,40 +35,51 @@ export function useDisplayUpdate(initialValue) {
     }, []);
 
 	const handleAddBinaryOperator = useCallback((value) => {
-		updateDisplay(function(prevState) {
+		updateCalc(function(prevState) {
             const invalid = (prevState.expression === '' || 
 						binaryOps.includes(prevState.expression.slice(-1)) || 
 						prevState.expression.slice(-1) === '(');
             if (invalid) {
                 return;
             } else {
+                const newValue = value === 'mod' ? '%' : value;
                 return {
                     ...prevState,
-                    expression: prevState.expression + value,
+                    expression: prevState.expression + newValue,
+                    forDisplay: prevState.forDisplay + value,
                 };
             }
         });
 	}, []);
 
 	const handleAddUnaryOperator = useCallback((value) => {
-		updateDisplay(function(prevState) {
-            if (value === '^2' || value === '!')  {
+		updateCalc(function(prevState) {
+            if (value === 'x^2' || value === '!')  {
                 if (digits.includes(prevState.expression.slice(-1))) {
+                    const newValue = value === 'x^2'? '^2': value;
                     return {
                         ...prevState,
-                        expression: prevState.expression + value,
+                        expression: prevState.expression + newValue,
+                        forDisplay: prevState.forDisplay + value,
                         result: evaluateWithNewValue(prevState.expression, 
-                            value, prevState.stack.length),
+                            newValue, prevState.stack.length),
                     };
                 } else {
                     return;
                 }
             } else {
+                let newValue = value;
+                if (value === 'e^x') {
+                    newValue = 'exp';
+                } else if (value === '√') {
+                    newValue = 'sqrt';
+                }
                 let newStack = (prevState.stack.length === 0) ? 
                                 [1] : [...prevState.stack, 1];
                 return {
                     ...prevState,
-                    expression: prevState.expression + value + '(',
+                    expression: prevState.expression + newValue + '(',
+                    forDisplay: prevState.forDisplay + (value === '√' ? '√': newValue + '('),
                     stack: newStack,
                 };
             }
@@ -74,24 +87,25 @@ export function useDisplayUpdate(initialValue) {
 	}, []);
 
 	const handleAddSpecial = useCallback(value => {
-		updateDisplay(function(prevState) {
-            if (value === 'pi') {
-                value = math.pi;
-            } else if (value === '!' && 
+		updateCalc(function(prevState) {
+            if (value === '!' && 
             !digits.includes(Number.parseInt(prevState.expression.slice(-1)))) {
-                value = '';
+                return;
             } 
+            const newValue = (value === 'π') ? math.pi : 
+                            (value === 'e' ? 'exp(1)' : value);
             return {
                 ...prevState,
-                expression: prevState.expression + value,
+                expression: prevState.expression + newValue,
+                forDisplay: prevState.forDisplay + value,
                 result: evaluateWithNewValue(prevState.expression, 
-                    value, prevState.stack.length),
+                    newValue, prevState.stack.length),
             };
         });
 	}, []);
 
 	const handleAddParenthesis = useCallback((value) => {
-        updateDisplay(function(prevState) {
+        updateCalc(function(prevState) {
             const conditionOpen = prevState.expression === '' || 
 				digits.includes(Number.parseInt(prevState.expression.slice(-1))) ||
 				prevState.expression.slice(-1) === '(' ||
@@ -103,6 +117,7 @@ export function useDisplayUpdate(initialValue) {
                 let newState = {
                     ...prevState,
                     expression: prevState.expression + value,
+                    forDisplay: prevState.forDisplay + value,
                     stack: [...prevState.stack, 1],
                     result: evaluateWithNewValue(prevState.expression,
                         value, prevState.stack.length + 1),
@@ -112,6 +127,7 @@ export function useDisplayUpdate(initialValue) {
                 let newState = {
                     ...prevState,
                     expression: prevState.expression + value,
+                    forDisplay: prevState.forDisplay + value,
                     stack: prevState.stack.filter((_, i) => i < prevState.stack.length - 1),
                     result: evaluateWithNewValue(prevState.expression,
                         value, prevState.stack.length - 1),
@@ -124,7 +140,7 @@ export function useDisplayUpdate(initialValue) {
 	}, []);
 	
     const handleCalculation = useCallback(() => {
-        updateDisplay(function(prevState) {
+        updateCalc(function(prevState) {
             if (prevState.expression !== '' && !binaryOps.includes(prevState.expression.slice(-1))) {
                 let expr = fillInClosingParen(prevState.expression, prevState.stack.length);
                 let res = evaluateWithNewValue(prevState.expression, 'calculate', 
@@ -143,6 +159,7 @@ export function useDisplayUpdate(initialValue) {
                 let newState = {
                     ...prevState,
                     expression: res,
+                    forDisplay: res,
                     previous: expr,
                     history: newHistory, 
                     result: res,
@@ -154,12 +171,14 @@ export function useDisplayUpdate(initialValue) {
     }, []);
 
     const handleDeleteLast = useCallback((value) => {
-        updateDisplay(function(prevState) {
+        updateCalc(function(prevState) {
             let expr = prevState.previous !== '' ? prevState.previous : prevState.expression;
-            let [newExpr, newStack] = removePreviousValue(expr, prevState.stack);
+            let [newExpr, newStack, newDisplay] = removeLastValue(expr, prevState.stack, 
+                prevState.forDisplay);
             return {
                 ...prevState,
                 expression: newExpr,
+                forDisplay: newDisplay,
                 stack: newStack,
                 result: evaluateWithNewValue(newExpr, 'deleteLast', newStack.length),
                 previous: '',
@@ -168,7 +187,7 @@ export function useDisplayUpdate(initialValue) {
     }, []);
 
     const handleResetCalculator = useCallback(() => {
-        updateDisplay(function(prevState) {
+        updateCalc(function(prevState) {
             return {
                 ...prevState,
                 expression: '',
@@ -179,13 +198,13 @@ export function useDisplayUpdate(initialValue) {
     }, []);
 
     const handleClearHistory = useCallback(() => {
-        updateDisplay({
+        updateCalc({
             history: [],
         });
     }, []);
 
     const handleToggleDegree = useCallback(() => {
-        updateDisplay(function(prevState) {
+        updateCalc(function(prevState) {
             return {
                 ...prevState,
                 isDegree: !prevState.isDegree,
@@ -194,7 +213,7 @@ export function useDisplayUpdate(initialValue) {
     }, []);
 
     const handleToggleInverted = useCallback(() => {
-        updateDisplay(function(prevState) {
+        updateCalc(function(prevState) {
             return {
                 ...prevState,
                 isInverted: !prevState.isInverted,
@@ -203,7 +222,7 @@ export function useDisplayUpdate(initialValue) {
     }, []);
 
 	return {
-		display, 
+		calc, 
         handleAddExpression,
 		handleAddDigit,
 		handleAddSpecial,
@@ -237,20 +256,25 @@ function evaluateWithNewValue(currentExpr, newValue, stackLength) {
 	return '';
 }
 
-function removePreviousValue(currentExpr, currentStack) {
+function removeLastValue(currentExpr, currentStack, currentDisplay) {
     const regex = new RegExp(`(${unaryFns.join('|')})$`, 'gi');
     let lastValue = currentExpr.slice(-1);
     let newExpr = currentExpr.slice(0, -1);
     let newStack = null;
+    let newDisplay = currentDisplay.slice(0, -1);
     if (lastValue.slice(-1) === ')') {
         newStack = currentStack.length === 0 ? [1] : [...currentStack, 1];
     } else if (lastValue.slice(-1) === '(') {
         if (regex.test(newExpr)) {
             newExpr = newExpr.replace(regex, '');
+            newDisplay = newDisplay.replace(regex, '');
         }
         newStack = currentStack.filter((_, i) => i < currentStack.length - 1);
     } else {
+        if (/mo$/.test(newDisplay)) {
+            newDisplay = newDisplay.replace(/mo$/, '');
+        }
         newStack = currentStack.map(i => i);
     }
-    return [newExpr, newStack];
+    return [newExpr, newStack, newDisplay];
 }

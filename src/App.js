@@ -3,16 +3,15 @@ import {
 	LongMenu, 
 	History 
 } from './modules/components'
-import { useDisplayUpdate, digits } from './modules/logic';
+import { digits, useCalculator } from './modules/logic';
 
 function App() {
-	const special = ['pi', 'e', '!'];
-	const unaryOps = ['sqrt', 'exp', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
-	const unaryOpsInv = ['^2', 'log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
+	const unaryOps = ['√', 'e^x', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
+	const unaryOpsInv = ['x^2', 'log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 	const menuOptions = ['None', 'History'];
 
 	const {
-		display, 
+		calc, 
         handleAddExpression,
 		handleAddDigit,
 		handleAddSpecial,
@@ -25,8 +24,9 @@ function App() {
         handleClearHistory,
         handleToggleInverted,
         handleDeleteLast
-	} = useDisplayUpdate({
+	} = useCalculator({
 		expression: '',
+		forDisplay: '',
         stack: [],
         result: '',
         previous: '',
@@ -45,14 +45,14 @@ function App() {
 		const item = e.target.textContent;
 		handleAddExpression(item);
 	}
-	console.log(display.stack);
+	console.log(calc.stack);
 
   	return (
       	<div className="app"> 
 			<div className="calculator">
 				<History 
 				className={historyVisible ? "history open" : "history closed"}
-				contents={display.history ? display.history : []}
+				contents={calc.history ? calc.history : []}
 				onClickHistoryItem={(e) => handleClickHistoryItem(e)}
 				onClickClearHistory={handleClearHistory}
 				/>
@@ -61,24 +61,22 @@ function App() {
 				options={menuOptions} 
 				onClickHistoryPanel={() => toggleHistoryPanel()}/>
 				<div className="display">
-					<p>{display.expression || "0"}</p>
-					{display.result ?  <p>({display.result})</p> : ""}					
+					<p>{calc.forDisplay || "0"}</p>
+					{calc.result ?  <p>({calc.result})</p> : ""}					
 				</div>
 				<div className="scientific">
 					<div className="alwaysVisible">
-					  	{special.map(e => 
-							<button 
-							key={e}
-							onClick={() => handleAddSpecial(e)}>{e}</button>	
-						)}
+						<button onClick={() => handleAddSpecial('π')}>π</button>	
+						<button onClick={() => handleAddSpecial('e')}>e</button>	
 					</div>
 					<div className="drawer">
 					   <div className="switchButtons">
-							<button onClick={handleToggleDegree}>{display.isDegree ? 'DEG' : 'RAD'}</button>
+							<button onClick={handleToggleDegree}>{calc.isDegree ? 'DEG' :
+							 'RAD'}</button>
 							<button onClick={handleToggleInverted}>INV</button>
 					   </div>
 					   <div className="invertible">
-						{display.isInverted ? 
+						{calc.isInverted ? 
 							unaryOpsInv.map(e => 
 								<button 
 								key={e}
@@ -100,7 +98,7 @@ function App() {
 							key={d}>{d}</button>
 						)}
 						<button onClick={() => handleAddDigit("0")}>0</button>
-						<button onClick={() => handleAddDigit(".")}>.</button>
+						<button onClick={() => handleAddExpression(".")}>.</button>
 						<button onClick={handleDeleteLast}>DEL</button>
 					</div>
 					<div className="operators">
@@ -111,7 +109,8 @@ function App() {
 						<button onClick={() => handleAddParenthesis('(')}>(</button>
 						<button onClick={() => handleAddParenthesis(')')}>)</button>
 						<button onClick={() => handleAddBinaryOperator('^')}>^</button>
-						<button onClick={() => handleAddBinaryOperator('%')}>mod</button>
+						<button onClick={() => handleAddUnaryOperator('!')}>!</button>
+						<button onClick={() => handleAddBinaryOperator('mod')}>mod</button>
 						<button onClick={handleCalculation}>=</button>
 						<button onClick={handleResetCalculator}>AC</button>
 					</div>
