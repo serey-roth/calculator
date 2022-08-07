@@ -28,8 +28,8 @@ function App() {
         handleDeleteLast
 	} = useCalculator({
 		expression: '',
-		forDisplay: '',
         stack: [],
+		forDisplay: '',
         result: '',
         previous: '',
         history: [],
@@ -37,6 +37,8 @@ function App() {
         isInverted: false,
 	});
 
+	console.log(calc);
+	
 	const [historyVisible, setHistoryVisible] = useState(false);
 
 	const toggleHistoryPanel = () => {
@@ -110,7 +112,6 @@ function App() {
 						<button onClick={() => handleAddParenthesis('(')}>(</button>
 						<button onClick={() => handleAddParenthesis(')')}>)</button>
 						<button onClick={() => handleAddBinaryOperator('^')}>^</button>
-						<button onClick={() => handleAddUnaryOperator('!')}>!</button>
 						<button onClick={() => handleAddBinaryOperator('mod')}>mod</button>
 						<button onClick={handleCalculation}>=</button>
 						<button onClick={handleResetCalculator}>AC</button>

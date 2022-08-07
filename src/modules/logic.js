@@ -40,12 +40,11 @@ export function useCalculator(initialValue) {
 						binaryOps.includes(prevState.expression.slice(-1)) || 
 						prevState.expression.slice(-1) === '(');
             if (invalid) {
-                return;
+                return prevState;
             } else {
-                const newValue = value === 'mod' ? '%' : value;
                 return {
                     ...prevState,
-                    expression: prevState.expression + newValue,
+                    expression: prevState.expression + value,
                     forDisplay: prevState.forDisplay + value,
                 };
             }
@@ -54,18 +53,18 @@ export function useCalculator(initialValue) {
 
 	const handleAddUnaryOperator = useCallback((value) => {
 		updateCalc(function(prevState) {
-            if (value === 'x^2' || value === '!')  {
+            if (value === 'x^2')  {
                 if (numbers.includes(prevState.expression.slice(-1))) {
                     const newValue = value === 'x^2'? '^2': value;
                     return {
                         ...prevState,
                         expression: prevState.expression + newValue,
-                        forDisplay: prevState.forDisplay + value,
+                        forDisplay: prevState.forDisplay + newValue,
                         result: evaluateWithNewValue(prevState.expression, 
                             newValue, prevState.stack.length),
                     };
                 } else {
-                    return;
+                    return prevState;
                 }
             } else {
                 let newValue = value;
@@ -129,7 +128,7 @@ export function useCalculator(initialValue) {
                 };
                 return newState;
             } else {
-                return;
+                return prevState;
             }
         });
 	}, []);
@@ -186,6 +185,7 @@ export function useCalculator(initialValue) {
             return {
                 ...prevState,
                 expression: '',
+                forDisplay: '',
                 result: '',
                 stack: [],
             }
@@ -193,8 +193,11 @@ export function useCalculator(initialValue) {
     }, []);
 
     const handleClearHistory = useCallback(() => {
-        updateCalc({
-            history: [],
+        updateCalc(function(prevState) {
+            return {
+                ...prevState,
+                history: [],
+            }
         });
     }, []);
 
@@ -240,15 +243,24 @@ function fillInClosingParen(currentExpr, stackLength) {
     return currentExpr;
 }
 
+
+function renderForCalculation(currentExpr) {
+    if (/π/gi.test(currentExpr)) {
+        currentExpr = currentExpr.replace(/π/gi, math.pi);
+    } 
+    if (/exp1/gi.test(currentExpr)) {
+        currentExpr = currentExpr.replace(/exp1/gi, 'exp(1)');
+    }
+    if (/mod/gi.test(currentExpr)) {
+        currentExpr = currentExpr.replace(/mod/gi, '%');
+    }
+    return currentExpr;
+}
+
 function evaluateWithNewValue(currentExpr, newValue, stackLength) {
 	if (numbers.includes(newValue) || newValue === ')' || newValue === "calculate") {
         currentExpr += newValue === 'calculate' ? '' : newValue;
-        if (/π/gi.test(currentExpr)) {
-            currentExpr = currentExpr.replace(/π/gi, math.pi);
-        } 
-        if (/exp1/gi.test(currentExpr)) {
-            currentExpr = currentExpr.replace(/exp1/gi, 'exp(1)');
-        }
+        currentExpr = renderForCalculation(currentExpr);
 		return math.evaluate(fillInClosingParen(currentExpr, stackLength)).toString();
 	} 
 	return '';
@@ -261,9 +273,6 @@ function removeLastValue(currentExpr, currentStack, currentDisplay) {
     let newStack = null;
     let newDisplay = currentDisplay.slice(0, -1);
     if (lastValue.slice(-1) === ')') {
-        if (/exp\(1$/.test(newExpr)) {
-            newExpr = newExpr.replace(/exp\(1$/, '');
-        }
         newStack = currentStack.length === 0 ? [1] : [...currentStack, 1];
     } else if (lastValue.slice(-1) === '(') {
         if (regex.test(newExpr)) {
