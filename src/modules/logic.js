@@ -2,10 +2,10 @@ import { useState, useCallback } from "react";
 
 const math = require('mathjs');
 
+const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'exp1', 'π'];
 const binaryOps = ['+', '-', '*', '/', '.', '^', '%'];
 const unaryFns = ['sqrt', 'exp', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
 'log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
-export const digits = Array.from(Array(9), (_, d) => d + 1);
 
 export function useCalculator(initialValue) {
 	const [calc, updateCalc] = useState(initialValue);
@@ -29,7 +29,7 @@ export function useCalculator(initialValue) {
 			expression: prevState.expression + value,
             forDisplay: prevState.forDisplay + value,
 			result: evaluateWithNewValue(prevState.expression, 
-				value, prevState.stack.length),
+				Number.parseInt(value), prevState.stack.length),
 		    };
         });
     }, []);
@@ -55,7 +55,7 @@ export function useCalculator(initialValue) {
 	const handleAddUnaryOperator = useCallback((value) => {
 		updateCalc(function(prevState) {
             if (value === 'x^2' || value === '!')  {
-                if (digits.includes(prevState.expression.slice(-1))) {
+                if (numbers.includes(prevState.expression.slice(-1))) {
                     const newValue = value === 'x^2'? '^2': value;
                     return {
                         ...prevState,
@@ -88,12 +88,7 @@ export function useCalculator(initialValue) {
 
 	const handleAddSpecial = useCallback(value => {
 		updateCalc(function(prevState) {
-            if (value === '!' && 
-            !digits.includes(Number.parseInt(prevState.expression.slice(-1)))) {
-                return;
-            } 
-            const newValue = (value === 'π') ? math.pi : 
-                            (value === 'e' ? 'exp(1)' : value);
+            const newValue = value === 'e' ? 'exp1' : value;
             return {
                 ...prevState,
                 expression: prevState.expression + newValue,
@@ -107,11 +102,11 @@ export function useCalculator(initialValue) {
 	const handleAddParenthesis = useCallback((value) => {
         updateCalc(function(prevState) {
             const conditionOpen = prevState.expression === '' || 
-				digits.includes(Number.parseInt(prevState.expression.slice(-1))) ||
+				numbers.includes(Number.parseInt(prevState.expression.slice(-1))) ||
 				prevState.expression.slice(-1) === '(' ||
 			    (prevState.expression.slice(-1) === ')' && prevState.stack.length === 0) ||
 				(binaryOps.includes(prevState.expression.slice(-1)));
-            const conditionClose = digits.includes(Number.parseInt(prevState.expression.slice(-1))) || 
+            const conditionClose = numbers.includes(Number.parseInt(prevState.expression.slice(-1))) || 
 				prevState.stack.length > 0;
             if (value === '(' && conditionOpen) {
                 let newState = {
@@ -246,13 +241,16 @@ function fillInClosingParen(currentExpr, stackLength) {
 }
 
 function evaluateWithNewValue(currentExpr, newValue, stackLength) {
-	if (digits.includes(Number.parseInt(newValue)) || 
-    newValue === ')') {
-		return math.evaluate(fillInClosingParen(currentExpr + newValue, 
-            stackLength)).toString();
-	} else if (newValue === "calculate") {
-        return math.evaluate(fillInClosingParen(currentExpr, stackLength)).toString();
-    }
+	if (numbers.includes(newValue) || newValue === ')' || newValue === "calculate") {
+        currentExpr += newValue === 'calculate' ? '' : newValue;
+        if (/π/gi.test(currentExpr)) {
+            currentExpr = currentExpr.replace(/π/gi, math.pi);
+        } 
+        if (/exp1/gi.test(currentExpr)) {
+            currentExpr = currentExpr.replace(/exp1/gi, 'exp(1)');
+        }
+		return math.evaluate(fillInClosingParen(currentExpr, stackLength)).toString();
+	} 
 	return '';
 }
 
@@ -263,6 +261,9 @@ function removeLastValue(currentExpr, currentStack, currentDisplay) {
     let newStack = null;
     let newDisplay = currentDisplay.slice(0, -1);
     if (lastValue.slice(-1) === ')') {
+        if (/exp\(1$/.test(newExpr)) {
+            newExpr = newExpr.replace(/exp\(1$/, '');
+        }
         newStack = currentStack.length === 0 ? [1] : [...currentStack, 1];
     } else if (lastValue.slice(-1) === '(') {
         if (regex.test(newExpr)) {
@@ -271,9 +272,12 @@ function removeLastValue(currentExpr, currentStack, currentDisplay) {
         }
         newStack = currentStack.filter((_, i) => i < currentStack.length - 1);
     } else {
+        if (/exp$/.test(newExpr)) {
+            newExpr = newExpr.replace(/exp$/, '');
+        } 
         if (/mo$/.test(newDisplay)) {
             newDisplay = newDisplay.replace(/mo$/, '');
-        }
+        } 
         newStack = currentStack.map(i => i);
     }
     return [newExpr, newStack, newDisplay];

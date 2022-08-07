@@ -3,7 +3,9 @@ import {
 	LongMenu, 
 	History 
 } from './modules/components'
-import { digits, useCalculator } from './modules/logic';
+import { useCalculator } from './modules/logic';
+
+const digits = Array.from(Array(9), (_, d) => d + 1);
 
 function App() {
 	const unaryOps = ['√', 'e^x', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
@@ -45,7 +47,6 @@ function App() {
 		const item = e.target.textContent;
 		handleAddExpression(item);
 	}
-	console.log(calc.stack);
 
   	return (
       	<div className="app"> 
