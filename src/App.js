@@ -13,7 +13,7 @@ function App() {
 	const menuOptions = ['None', 'History'];
 
 	const {
-		calc, 
+		state, 
         handleAddExpression,
 		handleAddDigit,
 		handleAddSpecial,
@@ -47,13 +47,13 @@ function App() {
 		const item = e.target.textContent;
 		handleAddExpression(item);
 	}
-	console.log(calc)
+	
   	return (
       	<div className="app"> 
 			<div className="calculator">
 				<History 
 				className={historyVisible ? "history open" : "history closed"}
-				contents={calc.history ? calc.history : []}
+				contents={state.history ? state.history : []}
 				onClickHistoryItem={(e) => handleClickHistoryItem(e)}
 				onClickClearHistory={handleClearHistory}
 				/>
@@ -62,8 +62,8 @@ function App() {
 				options={menuOptions} 
 				onClickHistoryPanel={() => toggleHistoryPanel()}/>
 				<div className="display">
-					<p>{calc.forDisplay || "0"}</p>
-					{calc.result ?  <p>({calc.result})</p> : ""}					
+					<p>{state.forDisplay || "0"}</p>
+					{state.result ?  <p>({state.result})</p> : ""}					
 				</div>
 				<div className="scientific">
 					<div className="alwaysVisible">
@@ -72,12 +72,12 @@ function App() {
 					</div>
 					<div className="drawer">
 					   <div className="switchButtons">
-							<button onClick={handleToggleDegree}>{calc.isDegree ? 'DEG' :
+							<button onClick={handleToggleDegree}>{state.isDegree ? 'DEG' :
 							 'RAD'}</button>
 							<button onClick={handleToggleInverted}>INV</button>
 					   </div>
 					   <div className="invertible">
-						{calc.isInverted ? 
+						{state.isInverted ? 
 							unaryOpsInv.map(e => 
 								<button 
 								key={e}
