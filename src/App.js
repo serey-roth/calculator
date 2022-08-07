@@ -37,8 +37,6 @@ function App() {
         isInverted: false,
 	});
 
-	console.log(calc);
-	
 	const [historyVisible, setHistoryVisible] = useState(false);
 
 	const toggleHistoryPanel = () => {
@@ -49,7 +47,7 @@ function App() {
 		const item = e.target.textContent;
 		handleAddExpression(item);
 	}
-
+	console.log(calc)
   	return (
       	<div className="app"> 
 			<div className="calculator">

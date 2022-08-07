@@ -7,6 +7,9 @@ const binaryOps = ['+', '-', '*', '/', '.', '^', '%'];
 const unaryFns = ['sqrt', 'exp', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
 'log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 
+const rxDel = new RegExp(`(${unaryFns.join('|')})$`, 'gi');
+const rxAdd = unaryFns.map(fn => new RegExp(`${fn}`, 'g'));
+
 export function useCalculator(initialValue) {
 	const [calc, updateCalc] = useState(initialValue);
 	
@@ -23,14 +26,18 @@ export function useCalculator(initialValue) {
 
 	const handleAddDigit = useCallback((value) => {
 		updateCalc(function(prevState) {
-            console.log(prevState);
-            return {
-			...prevState,
-			expression: prevState.expression + value,
-            forDisplay: prevState.forDisplay + value,
-			result: evaluateWithNewValue(prevState.expression, 
-				Number.parseInt(value), prevState.stack.length),
-		    };
+            let newExpr = renderCorrectAngleUnit(prevState.isDegree,
+                prevState.expression, value);
+            let newResult = evaluateWithNewValue(newExpr, 
+                'calculate', prevState.stack.length);
+            let newState = {
+                ...prevState,
+                expression: newExpr,
+                forDisplay: prevState.forDisplay + value,
+                result: newResult,
+                };
+            console.log(newState)
+            return newState;
         });
     }, []);
 
@@ -90,10 +97,12 @@ export function useCalculator(initialValue) {
             const newValue = value === 'e' ? 'exp1' : value;
             return {
                 ...prevState,
-                expression: prevState.expression + newValue,
+                expression: renderCorrectAngleUnit(prevState.isDegree,
+                    prevState.expression, newValue),
                 forDisplay: prevState.forDisplay + value,
-                result: evaluateWithNewValue(prevState.expression, 
-                    newValue, prevState.stack.length),
+                result: evaluateWithNewValue(renderCorrectAngleUnit(prevState.isDegree,
+                    prevState.expression, newValue), 
+                    'calculate', prevState.stack.length),
             };
         });
 	}, []);
@@ -158,7 +167,6 @@ export function useCalculator(initialValue) {
                     history: newHistory, 
                     result: res,
                 };
-                console.log(newState);
                 return newState;
             }
         });
@@ -243,7 +251,6 @@ function fillInClosingParen(currentExpr, stackLength) {
     return currentExpr;
 }
 
-
 function renderForCalculation(currentExpr) {
     if (/π/gi.test(currentExpr)) {
         currentExpr = currentExpr.replace(/π/gi, math.pi);
@@ -267,27 +274,49 @@ function evaluateWithNewValue(currentExpr, newValue, stackLength) {
 }
 
 function removeLastValue(currentExpr, currentStack, currentDisplay) {
-    const regex = new RegExp(`(${unaryFns.join('|')})$`, 'gi');
     let lastValue = currentExpr.slice(-1);
     let newExpr = currentExpr.slice(0, -1);
     let newStack = null;
     let newDisplay = currentDisplay.slice(0, -1);
-    if (lastValue.slice(-1) === ')') {
+    if (lastValue === ')') {
         newStack = currentStack.length === 0 ? [1] : [...currentStack, 1];
-    } else if (lastValue.slice(-1) === '(') {
-        if (regex.test(newExpr)) {
-            newExpr = newExpr.replace(regex, '');
-            newDisplay = newDisplay.replace(regex, '');
+    } else if (lastValue === '(') {
+        if (rxDel.test(newExpr)) {
+            newExpr = newExpr.replace(rxDel, '');
+            newDisplay = newDisplay.replace(rxDel, '');
         }
         newStack = currentStack.filter((_, i) => i < currentStack.length - 1);
     } else {
-        if (/exp$/.test(newExpr)) {
+        if (/exp$/.test(newExpr)) {//this is for the number e which i set as exp1
             newExpr = newExpr.replace(/exp$/, '');
         } 
-        if (/mo$/.test(newDisplay)) {
+        if (/mo$/.test(newDisplay)) {//this is for mod in display
             newDisplay = newDisplay.replace(/mo$/, '');
         } 
+        if (/\d+ de$/g.test(newExpr)) {
+            newExpr = newExpr.replace(/ de$/g, '');
+        }
         newStack = currentStack.map(i => i);
     }
     return [newExpr, newStack, newDisplay];
+}
+
+function renderCorrectAngleUnit(isDegree, currentExpr, newValue) {
+    if (isDegree) {
+        if (rxAdd.some(rx => rx.test(currentExpr))) {
+            if (/ deg$/g.test(currentExpr)) {
+                currentExpr = currentExpr.replace(/ deg$/g, '')
+            }
+            console.log(currentExpr)
+            return currentExpr + `${newValue} deg`;
+        }
+    } else {
+        if (rxAdd.some(rx => rx.test(currentExpr))) {
+            if (/ rad$/g.test(currentExpr)) {
+                currentExpr = currentExpr.replace(/ rad$/g, '')
+            }
+            return currentExpr + `${newValue} rad`;
+        }
+    }
+    return currentExpr + newValue;
 }
