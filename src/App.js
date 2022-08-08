@@ -9,7 +9,7 @@ const digits = Array.from(Array(9), (_, d) => d + 1);
 
 function App() {
 	const unaryOps = ['√', 'e^x', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
-	const unaryOpsInv = ['x^2', 'log', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
+	const unaryOpsInv = ['x^2', 'ln', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 	const menuOptions = ['None', 'History'];
 
 	const {
@@ -106,7 +106,7 @@ function App() {
 						<button onClick={() => handleAddBinaryOperator("+")}>+</button>
 						<button onClick={() => handleAddBinaryOperator("-")}>-</button>
 						<button onClick={() => handleAddBinaryOperator("*")}>&times;</button>
-						<button onClick={() => handleAddBinaryOperator("/")}>&divide;</button>
+						<button onClick={() => handleAddBinaryOperator("÷")}>&divide;</button>
 						<button onClick={() => handleAddParenthesis('(')}>(</button>
 						<button onClick={() => handleAddParenthesis(')')}>)</button>
 						<button onClick={() => handleAddBinaryOperator('^')}>^</button>
