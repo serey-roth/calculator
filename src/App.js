@@ -14,9 +14,9 @@ function App() {
 
 	const {
 		state, 
-        handleAddExpression,
 		handleAddDigit,
-		handleAddSpecial,
+        handleAddExpression,
+		handleAddConstant,
 		handleAddUnaryOperator,
 		handleAddBinaryOperator,
 		handleAddParenthesis,
@@ -62,13 +62,13 @@ function App() {
 				options={menuOptions} 
 				onClickHistoryPanel={() => toggleHistoryPanel()}/>
 				<div className="display">
-					<p>{state.forDisplay || "0"}</p>
+					<p>{state.forDisplay || ""}</p>
 					{state.result ?  <p>({state.result})</p> : ""}					
 				</div>
 				<div className="scientific">
 					<div className="alwaysVisible">
-						<button onClick={() => handleAddSpecial('π')}>π</button>	
-						<button onClick={() => handleAddSpecial('e')}>e</button>	
+						<button onClick={() => handleAddConstant('π')}>π</button>	
+						<button onClick={() => handleAddConstant('e')}>e</button>	
 					</div>
 					<div className="drawer">
 					   <div className="switchButtons">
@@ -99,7 +99,7 @@ function App() {
 							key={d}>{d}</button>
 						)}
 						<button onClick={() => handleAddDigit("0")}>0</button>
-						<button onClick={() => handleAddExpression(".")}>.</button>
+						<button onClick={() => handleAddDigit(".")}>.</button>
 						<button onClick={handleDeleteLast}>DEL</button>
 					</div>
 					<div className="operators">

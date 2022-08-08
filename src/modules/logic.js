@@ -2,9 +2,9 @@ import { useReducer } from "react";
 
 const math = require('mathjs');
 
-const numbers = ['0', '1', '2', '3', '4', 
+const numbers = ['1', '2', '3', '4', 
 '5', '6', '7', '8', '9', 'exp1', 'π'];
-const binaryOps = ['+', '-', '*', '/', '.', '^', '%'];
+const binaryOps = ['+', '-', '*', '/', '^', '%'];
 const unaryFns = ['sqrt', 'exp', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc',
 'sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'ln'];
 const invAngleFn = ['asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
@@ -13,11 +13,12 @@ const rxDel = new RegExp(`(${unaryFns.join('|')})$`, 'i');
 const rxAdd = unaryFns.map(fn => 
     new RegExp(`${fn}\\(\\d+\\.*\\d*(.\\d+\\.*\\d*)*\\)`, 'i'));
 
+console.log(math.evaluate('0002 + 00002 + sin(0002)'))
 export function useCalculator(initialValue) {
 	const action = {
         ADD_EXPRESSION: 'ADD_EXPRESSION',
         ADD_DIGIT: 'ADD_DIGIT',
-        ADD_SPECIAL: 'ADD_SPECIAL',
+        ADD_CONSTANT: 'ADD_CONSTANT',
         ADD_UNARY: 'ADD_UNARY',
         ADD_BINARY: 'ADD_BINARY',
         ADD_PARENTHESIS: 'ADD_PARENTHESIS',
@@ -45,12 +46,20 @@ export function useCalculator(initialValue) {
                 if (expr.slice(-1) === ')') {
                     expr += '*';
                 }
+                let newExpr = expr;
+                let newDispl = state.forDisplay;
+                let actionType = 'ADD';
+                if (value === '.') {
+                    newExpr = expr === '' ? '0' : expr;
+                    newDispl = state.forDisplay === '' ? '0' : state.forDisplay;
+                    actionType = 'CALCULATE';
+                }
                 return {
                     ...state,
-                    expression: expr + value,
-                    forDisplay: state.forDisplay + value,
-                    result: evaluate(state.isDegree, expr, value, 
-                        state.stack.length, 'ADD'),
+                    expression: newExpr + value,
+                    forDisplay: newDispl + value,
+                    result: evaluate(state.isDegree, newExpr, value, 
+                        state.stack.length, actionType),
                 };
             }
             case 'ADD_BINARY': {
@@ -100,7 +109,7 @@ export function useCalculator(initialValue) {
                     };
                 }
             }
-            case 'ADD_SPECIAL': {
+            case 'ADD_CONSTANT': {
                 const newValue = value === 'e' ? 'exp1' : value;
                 return {
                     ...state,
@@ -198,13 +207,19 @@ export function useCalculator(initialValue) {
                 let ex = state.previous !== '' ? state.previous : expr;
                 let [newExpr, newStack, newDisplay] = removeLastValue(ex, state.stack, 
                     state.forDisplay);
+                let actionType = 'DELETE';
+                let value = newExpr.slice(-1);
+                if (value === '.') {
+                    actionType = 'CALCULATE';
+                    value = '';
+                }
                 return {
                     ...state,
                     expression: newExpr,
                     forDisplay: newDisplay,
                     stack: newStack,
                     result: evaluate(state.isDegree,
-                        newExpr, newExpr.slice(-1), newStack.length, 'DELETE'),
+                        newExpr, value, newStack.length, actionType),
                     previous: '',
                 }
             }
@@ -230,8 +245,8 @@ export function useCalculator(initialValue) {
 		dispatch({type: action.ADD_UNARY, payload: value});
 	};
 
-	const handleAddSpecial = value => {
-		dispatch({type: action.ADD_SPECIAL, payload: value});
+	const handleAddConstant = value => {
+		dispatch({type: action.ADD_CONSTANT, payload: value});
 	};
 
 	const handleAddParenthesis = (value) => {
@@ -266,7 +281,7 @@ export function useCalculator(initialValue) {
 		state, 
         handleAddExpression,
 		handleAddDigit,
-		handleAddSpecial,
+		handleAddConstant,
 		handleAddUnaryOperator,
 		handleAddBinaryOperator,
 		handleAddParenthesis,
@@ -314,10 +329,11 @@ function evaluate(isDegree, currentExpr, newValue, stackLength, actionType) {
         currentExpr = renderSymbolsForEval(currentExpr);
         currentExpr = fillInClosingParen(currentExpr, stackLength);
         currentExpr = renderFunctions(isDegree, currentExpr);
-        return math.evaluate(currentExpr).toString();
+        if (currentExpr !== '') {
+            return math.evaluate(currentExpr).toString();
+        }
     }
     return;
-	
 }
 
 function removeLastValue(currentExpr, currentStack, currentDisplay) {
