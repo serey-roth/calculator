@@ -17,7 +17,7 @@ function App() {
 		handleAddDigit,
         handleAddExpression,
 		handleAddConstant,
-		handleAddUnaryOperator,
+		handleAddFunction,
 		handleAddBinaryOperator,
 		handleAddParenthesis,
         handleCalculation,
@@ -81,12 +81,12 @@ function App() {
 							unaryOpsInv.map(e => 
 								<button 
 								key={e}
-								onClick={() => handleAddUnaryOperator(e)}>{e}</button>	
+								onClick={() => handleAddFunction(e)}>{e}</button>	
 								) : 
 							unaryOps.map(e => 
 								<button 
 								key={e}
-								onClick={() => handleAddUnaryOperator(e)}>{e}</button>	
+								onClick={() => handleAddFunction(e)}>{e}</button>	
 								)}
 					   </div>
 					</div>

@@ -19,7 +19,7 @@ export function useCalculator(initialValue) {
         ADD_EXPRESSION: 'ADD_EXPRESSION',
         ADD_DIGIT: 'ADD_DIGIT',
         ADD_CONSTANT: 'ADD_CONSTANT',
-        ADD_UNARY: 'ADD_UNARY',
+        ADD_FUNCTION: 'ADD_FUNCTION',
         ADD_BINARY: 'ADD_BINARY',
         ADD_PARENTHESIS: 'ADD_PARENTHESIS',
         CALCULATE: 'CALCULATE',
@@ -78,7 +78,7 @@ export function useCalculator(initialValue) {
                     };
                 }
             }
-            case 'ADD_UNARY': {
+            case 'ADD_FUNCTION': {
                 if (value === 'x^2')  {
                     if (numbers.includes(expr.slice(-1))) {
                         const newValue = value === 'x^2'? '^2': value;
@@ -101,12 +101,26 @@ export function useCalculator(initialValue) {
                     }
                     let newStack = (state.stack.length === 0) ? 
                                     [1] : [...state.stack, 1];
-                    return {
-                        ...state,
-                        expression: expr + newValue + '(',
-                        forDisplay: state.forDisplay + (value === '√' ? '√': newValue + '('),
-                        stack: newStack,
-                    };
+                    if (expr === '' || binaryOps.includes(expr.slice(-1)) ||
+                        expr.slice(-1) === '(') {
+                        return {
+                            ...state,
+                            expression: expr + newValue + '(',
+                            forDisplay: state.forDisplay + (value === '√' ? '√': newValue + '('),
+                            stack: newStack,
+                        };
+                    } else {
+                        let newExpr = newValue + '(' + expr;
+                        return {
+                            ...state,
+                            expression: newExpr,
+                            forDisplay: (value === '√' ? '√': newValue + '(') + state.forDisplay,
+                            stack: newStack,
+                            result: evaluate(state.isDegree, newExpr, '', 
+                            newStack.length, 'CALCULATE'),
+                        };
+                    }
+                    
                 }
             }
             case 'ADD_CONSTANT': {
@@ -241,8 +255,8 @@ export function useCalculator(initialValue) {
 		dispatch({type: action.ADD_BINARY, payload: value});
 	};
 
-	const handleAddUnaryOperator = (value) => {
-		dispatch({type: action.ADD_UNARY, payload: value});
+	const handleAddFunction = (value) => {
+		dispatch({type: action.ADD_FUNCTION, payload: value});
 	};
 
 	const handleAddConstant = value => {
@@ -282,7 +296,7 @@ export function useCalculator(initialValue) {
         handleAddExpression,
 		handleAddDigit,
 		handleAddConstant,
-		handleAddUnaryOperator,
+		handleAddFunction,
 		handleAddBinaryOperator,
 		handleAddParenthesis,
         handleCalculation,
