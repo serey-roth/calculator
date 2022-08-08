@@ -7,13 +7,12 @@ const numbers = ['0', '1', '2', '3', '4',
 const binaryOps = ['+', '-', '*', '/', '^', '%'];
 const func = ['sqrt', 'exp', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc',
 'sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'ln'];
-const invAngleFn = ['asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
+const trigFnInv = ['asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 
 const rxDel = new RegExp(`(${func.join('|')})$`, 'i');
 const rxAdd = func.map(fn => 
     new RegExp(`${fn}\\(\\d+\\.*\\d*(.\\d+\\.*\\d*)*\\)`, 'i'));
 
-console.log(math.evaluate('0002 + 00002 + sin(0002)'))
 export function useCalculator(initialValue) {
 	const action = {
         ADD_EXPRESSION: 'ADD_EXPRESSION',
@@ -215,6 +214,8 @@ export function useCalculator(initialValue) {
                 return {
                     ...state,
                     isDegree: !state.isDegree,
+                    result: evaluate(!state.isDegree, state.expression, '', 
+                    state.stack.length, 'CALCULATE'),
                 }
             }
             case 'DELETE_LAST': {
@@ -342,9 +343,13 @@ function evaluate(isDegree, currentExpr, newValue, stackLength, actionType) {
         }
         currentExpr = renderSymbolsForEval(currentExpr);
         currentExpr = fillInClosingParen(currentExpr, stackLength);
-        currentExpr = renderFunctions(isDegree, currentExpr);
-        if (currentExpr !== '') {
-            return math.evaluate(currentExpr).toString();
+        try {
+            currentExpr = renderFunctions(isDegree, currentExpr);
+            if (currentExpr !== '') {
+                return math.evaluate(currentExpr).toString();
+            }
+        } catch(error) {
+            return error.message;
         }
     }
     return;
@@ -385,14 +390,23 @@ function renderFunctions(isDegree, currentExpr) {
             new RegExp(`${fn}\\(\\d+\\.*\\d*(.\\d+\\.*\\d*)*\\)`, 'i'), function(a) {
                 if (fn === 'exp' || fn === 'sqrt') {
                     return math.evaluate(a);
-                } else if (invAngleFn.includes(fn)) {
-                    let res = math.evaluate(a);
-                    return isDegree ? convertAngleUnit('rad', 'deg', res) : res;
                 } else {
-                    let b = a.replace(/\d+\.*\d*(.\d+\.*\d*)*/g, (c) => math.evaluate(c).toString());
-                    b = b.replace(/\d+\.*\d*/g, (c) => math.unit(Number.parseFloat(c), 
+                    let b = a.replace(/\d+\.*\d*(.\d+\.*\d*)*/g, function(c) {
+                        c = math.evaluate(c);
+                        if (validDomain(fn, Number.parseFloat(c), isDegree)) {
+                            return c.toString();
+                        } else {
+                            throw new Error('Domain Error');
+                        }
+                    });
+                    if (trigFnInv.includes(fn)) {
+                        let res = math.evaluate(b);
+                        return isDegree ? convertAngleUnit('rad', 'deg', res) : res;
+                    } else {
+                        b = b.replace(/\d+\.*\d*/g, (c) => math.unit(Number.parseFloat(c), 
                             isDegree ? 'deg' : 'rad'));
-                    return math.evaluate(b);
+                        return math.evaluate(b);
+                    }
                 }
             }
         );
@@ -416,5 +430,26 @@ function convertAngleUnit(from, to, value) {
         return value * 180 / Math.PI;
     } else {
         return value;
+    }
+}
+
+function validDomain(fn, value, isDegree) {
+    if (trigFnInv.includes(fn)) {
+        if (fn === 'asin' || fn === 'acos') {
+            return value >= -1 && value <= 1;
+        } else if (fn === 'asec' || fn === 'acsc') {
+            return value <= -1 || value >= 1;
+        } else {
+            return true;
+        }
+    } else {
+        value = isDegree ? convertAngleUnit('deg', 'rad', value) : value;
+        if (fn === 'tan' || fn === 'sec') {
+            return !math.isInteger(2 * value / (math.pi));
+        } else if (fn === 'cot' || fn === 'csc') {
+            return !math.isInteger(value / (math.pi));
+        } else {
+            return true;
+        }
     }
 }
