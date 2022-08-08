@@ -2,15 +2,15 @@ import { useReducer } from "react";
 
 const math = require('mathjs');
 
-const numbers = ['1', '2', '3', '4', 
+const numbers = ['0', '1', '2', '3', '4', 
 '5', '6', '7', '8', '9', 'exp1', 'π'];
 const binaryOps = ['+', '-', '*', '/', '^', '%'];
-const unaryFns = ['sqrt', 'exp', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc',
+const func = ['sqrt', 'exp', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc',
 'sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'ln'];
 const invAngleFn = ['asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 
-const rxDel = new RegExp(`(${unaryFns.join('|')})$`, 'i');
-const rxAdd = unaryFns.map(fn => 
+const rxDel = new RegExp(`(${func.join('|')})$`, 'i');
+const rxAdd = func.map(fn => 
     new RegExp(`${fn}\\(\\d+\\.*\\d*(.\\d+\\.*\\d*)*\\)`, 'i'));
 
 console.log(math.evaluate('0002 + 00002 + sin(0002)'))
@@ -380,7 +380,7 @@ function renderFunctions(isDegree, currentExpr) {
     if (!fnExist) {
         return currentExpr;
     } else {
-        let fn = unaryFns[ind];
+        let fn = func[ind];
         currentExpr = currentExpr.replace(
             new RegExp(`${fn}\\(\\d+\\.*\\d*(.\\d+\\.*\\d*)*\\)`, 'i'), function(a) {
                 if (fn === 'exp' || fn === 'sqrt') {

@@ -110,8 +110,20 @@ button:hover {
   align-self: flex-end;
 }
 
+.top {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 50px;
+  align-items: center;
+}
+
+.top h3 {
+  flex-grow: 2;
+  padding-left: 15px;
+}
+
 #menu {
-  align-self: flex-end;
   background: inherit;
 }
 

@@ -8,8 +8,8 @@ import { useCalculator } from './modules/logic';
 const digits = Array.from(Array(9), (_, d) => d + 1);
 
 function App() {
-	const unaryOps = ['√', 'e^x', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
-	const unaryOpsInv = ['x^2', 'ln', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
+	const fn = ['√', 'e^x', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
+	const fnInv = ['x^2', 'ln', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 	const menuOptions = ['None', 'History'];
 
 	const {
@@ -57,10 +57,13 @@ function App() {
 				onClickHistoryItem={(e) => handleClickHistoryItem(e)}
 				onClickClearHistory={handleClearHistory}
 				/>
-				<LongMenu 
-				id="menu"
-				options={menuOptions} 
-				onClickHistoryPanel={() => toggleHistoryPanel()}/>
+				<div className="top">
+					<h3>{state.isDegree ? 'DEG' : 'RAD'}</h3>
+					<LongMenu 
+					id="menu"
+					options={menuOptions} 
+					onClickHistoryPanel={() => toggleHistoryPanel()}/>
+				</div>
 				<div className="display">
 					<p>{state.forDisplay || ""}</p>
 					{state.result ?  <p>({state.result})</p> : ""}					
@@ -72,18 +75,18 @@ function App() {
 					</div>
 					<div className="drawer">
 					   <div className="switchButtons">
-							<button onClick={handleToggleDegree}>{state.isDegree ? 'DEG' :
-							 'RAD'}</button>
+							<button onClick={handleToggleDegree}>{state.isDegree ? 'RAD' :
+							 'DEG'}</button>
 							<button onClick={handleToggleInverted}>INV</button>
 					   </div>
 					   <div className="invertible">
 						{state.isInverted ? 
-							unaryOpsInv.map(e => 
+							fnInv.map(e => 
 								<button 
 								key={e}
 								onClick={() => handleAddFunction(e)}>{e}</button>	
 								) : 
-							unaryOps.map(e => 
+							fn.map(e => 
 								<button 
 								key={e}
 								onClick={() => handleAddFunction(e)}>{e}</button>	
