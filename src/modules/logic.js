@@ -1,6 +1,5 @@
-import dayjs from "dayjs";
 import { useReducer } from "react";
-import { saveHistory } from "./history";
+import { ExpressionResult, History, saveHistory } from "./history";
 
 const math = require('mathjs');
 const day = require('dayjs');
@@ -185,19 +184,8 @@ export function useCalculator(initialValue) {
                     state.stack.length, 'CALCULATE');
                     expr = fillInClosingParen(expr, state.stack.length);
                     let newStack = [];
-                    let newHistory = state.history.length === 0 ? 
-                                    [{
-                                        date: day().format('MM/DD/YYYY'),
-                                        expression: expr,
-                                        result: res,
-                                    }] : 
-                                    [...state.history, 
-                                    {
-                                        date: day().format('MM/DD/YYYY'),
-                                        expression: expr,
-                                        result: res,
-                                    }
-                                    ];
+                    let newHistory = addToHistory(day().format('MM/DD/YYYY'),
+                    expr, res, state.history);
                     saveHistory(newHistory);
                     return {
                         ...state,
@@ -224,7 +212,7 @@ export function useCalculator(initialValue) {
                 saveHistory([]);
                 return {
                     ...state,
-                    history: [],
+                    history: new History(),
                 }
             }
             case 'TOGGLE_INVERTED': {
@@ -476,4 +464,10 @@ function validDomain(fn, value, isDegree) {
             return true;
         }
     }
+}
+
+function addToHistory(date, expression, result, history) {
+    let item = new ExpressionResult(expression, result);
+    history.addItem(date, item);
+    return history;
 }
