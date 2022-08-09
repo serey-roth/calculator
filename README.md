@@ -6,6 +6,11 @@ as a history database and function support.
 
 [Demo](https://serey-roth.github.io/calculator/)
 
+<img width="964" alt="Screen Shot 2022-08-09 at 4 15 32 PM" src="https://user-images.githubusercontent.com/88986106/183778578-427e2c94-e026-46e3-92a7-3e2598962e4c.png">
+<img width="897" alt="Screen Shot 2022-08-09 at 4 15 45 PM" src="https://user-images.githubusercontent.com/88986106/183778583-ce00f3b0-0255-4261-85ae-40c2f91ac26c.png">
+<img width="706" alt="Screen Shot 2022-08-09 at 4 16 07 PM" src="https://user-images.githubusercontent.com/88986106/183778585-34b35b1a-3ff1-4882-ab1d-9da11b1c1f22.png">
+<img width="654" alt="Screen Shot 2022-08-09 at 4 16 38 PM" src="https://user-images.githubusercontent.com/88986106/183778588-526e9622-da71-404b-bfd2-9d698a94b9c4.png">
+
 ### Description
 The calculator supports standard arithmetic operations, such as addition,
 subtraction, multiplication, division, modulo division and exponentiation,
