@@ -38,7 +38,8 @@ export function useCalculator(initialValue) {
                     ...state,
                     expression: expr + value,
                     forDisplay: state.forDisplay + value,
-                    result: math.evaluate(expr + value).toString(), 
+                    result: evaluate(state.isDegree, expr + value, '', 
+                        state.stack.length, 'CALCULATE'), 
                 };
             }
             case 'ADD_DIGIT': {
@@ -138,8 +139,8 @@ export function useCalculator(initialValue) {
                     expr.slice(-1) === '(' ||
                     (expr.slice(-1) === ')' && state.stack.length === 0) ||
                     (binaryOps.includes(expr.slice(-1)));
-                const conditionClose = numbers.includes(expr.slice(-1)) || 
-				    state.stack.length > 0;
+                const conditionClose = state.stack.length > 0 && 
+                (numbers.includes(expr.slice(-1)) || expr.slice(-1) === ')');
                 if (value === '(' && conditionOpen) {
                     return {
                         ...state,
@@ -164,17 +165,18 @@ export function useCalculator(initialValue) {
             }
             case 'CALCULATE': {
                 if (expr !== '' && !binaryOps.includes(expr.slice(-1))) {
-                    let ex = fillInClosingParen(expr, state.stack.length);
-                    let res = evaluate(state.isDegree, ex, '', 
-                    state.stack.length,'CALCULATE');
+                    let res = evaluate(state.isDegree, expr, '', 
+                    state.stack.length, 'CALCULATE');
+                    expr = fillInClosingParen(expr, state.stack.length);
+                    let newStack = [];
                     let newHistory = state.history.length === 0 ? 
                                     [{
-                                        expression: ex,
+                                        expression: expr,
                                         result: res,
                                     }] : 
                                     [...state.history, 
                                     {
-                                        expression: ex,
+                                        expression: expr,
                                         result: res,
                                     }
                                     ];
@@ -182,7 +184,8 @@ export function useCalculator(initialValue) {
                         ...state,
                         expression: res,
                         forDisplay: res,
-                        previous: ex,
+                        stack: newStack,
+                        previous: expr,
                         history: newHistory, 
                         result: res,
                     };
@@ -220,8 +223,9 @@ export function useCalculator(initialValue) {
             }
             case 'DELETE_LAST': {
                 let ex = state.previous !== '' ? state.previous : expr;
+                let disp = state.previous !== '' ? state.previous : state.forDisplay;
                 let [newExpr, newStack, newDisplay] = removeLastValue(ex, state.stack, 
-                    state.forDisplay);
+                    disp);
                 let actionType = 'DELETE';
                 let value = newExpr.slice(-1);
                 if (value === '.') {
@@ -381,6 +385,9 @@ function removeLastValue(currentExpr, currentStack, currentDisplay) {
 }
 
 function renderFunctions(isDegree, currentExpr) {
+    if (/\(\)/g.test(currentExpr)) {
+        throw new Error('Invalid Expression');
+    }
     let [fnExist, ind] = testForFunction(currentExpr)
     if (!fnExist) {
         return currentExpr;
