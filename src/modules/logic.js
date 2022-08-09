@@ -1,6 +1,9 @@
+import dayjs from "dayjs";
 import { useReducer } from "react";
+import { saveHistory } from "./history";
 
 const math = require('mathjs');
+const day = require('dayjs');
 
 const numbers = ['0', '1', '2', '3', '4', 
 '5', '6', '7', '8', '9', 'E', 'π'];
@@ -184,15 +187,18 @@ export function useCalculator(initialValue) {
                     let newStack = [];
                     let newHistory = state.history.length === 0 ? 
                                     [{
+                                        date: day().format('MM/DD/YYYY'),
                                         expression: expr,
                                         result: res,
                                     }] : 
                                     [...state.history, 
                                     {
+                                        date: day().format('MM/DD/YYYY'),
                                         expression: expr,
                                         result: res,
                                     }
                                     ];
+                    saveHistory(newHistory);
                     return {
                         ...state,
                         expression: res,
@@ -215,6 +221,7 @@ export function useCalculator(initialValue) {
                 };
             }
             case 'CLEAR_HISTORY': {
+                saveHistory([]);
                 return {
                     ...state,
                     history: [],

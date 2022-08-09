@@ -4,6 +4,7 @@ import {
 	History 
 } from './modules/components'
 import { useCalculator } from './modules/logic';
+import { loadHistory } from './modules/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft } from '@fortawesome/free-solid-svg-icons'
 
@@ -34,7 +35,7 @@ function App() {
 		forDisplay: '',
         result: '',
         previous: '',
-        history: [],
+        history: loadHistory(),
         isDegree: true,
         isInverted: false,
 	});

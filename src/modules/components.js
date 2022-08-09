@@ -77,8 +77,9 @@ export function History(props) {
 				<div 
 				className="expression-result"
 				key={ex + index}>
-					<p onClick={props.onClickHistoryItem}>{ex.expression}</p>
-					<p onClick={props.onClickHistoryItem}>{ex.result}</p>
+					<p className="date">{ex.date}</p>
+					<p className="expression" onClick={props.onClickHistoryItem}>{ex.expression}</p>
+					<p className="result" onClick={props.onClickHistoryItem}>{ex.result}</p>
 				</div>) : ""
 			}
 			</div>

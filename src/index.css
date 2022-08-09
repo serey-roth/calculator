@@ -68,6 +68,7 @@ button:hover {
   background-color: var(--light);
   color: var(--dark);
   align-self: stretch;
+  padding-bottom: 10px;
 }
 
 .history #head {
@@ -127,10 +128,19 @@ button:hover {
   flex-direction: column;
   width: 100%;
   margin-top: 10px;
+  border-bottom: 1px solid var(--dark);
 }
 
 .expression-result p {
   align-self: flex-end;
+}
+
+.expression-result .date {
+  align-self: flex-start;
+}
+
+.expression-result .result::before {
+  content: '> ';
 }
 
 .top {
