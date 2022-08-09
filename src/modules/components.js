@@ -9,6 +9,8 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 
 const ITEM_HEIGHT = 48;
 
+const dayjs = require('dayjs');
+
 export function LongMenu(props) {
 	const [anchorEl, setAnchorEl] = useState(null);
 	const open = Boolean(anchorEl);
@@ -77,7 +79,6 @@ function DateGroup(props) {
 	);
 }
 
-
 export function History(props) {
 	return (
 		<div className={props.className}>
@@ -92,7 +93,7 @@ export function History(props) {
 				{props.list.length > 0 ? 
 					props.list.map((ex, index) => 
 					<DateGroup 
-					date={ex.date}
+					date={relativeTime(dayjs(ex.date), dayjs())}
 					list={ex.list}
 					key={ex.date}
 					onClickItem={props.onClickHistoryItem}
@@ -101,4 +102,16 @@ export function History(props) {
 			</div>
 		</div>	
 	);
+}
+
+function relativeTime(date, today) {
+	let relDiff = Math.floor((today - date) / 86400000);
+	if (relDiff === 0) { return 'Today'; } 
+	else if (relDiff === 1) { return 'Yesterday'; }
+	else if (relDiff >= 2 && relDiff <= 6) { return `${relDiff} days ago`; }
+	else {
+		let d = Math.floor(relDiff / 7);
+		if (d === 1) { return 'Last week'; }
+		else { return `${d} weeks ago`; }
+	}
 }

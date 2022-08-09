@@ -13,7 +13,7 @@ const digits = Array.from(Array(9), (_, d) => d + 1);
 function App() {
 	const fn = ['√', 'e^x', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
 	const fnInv = ['x^2', 'ln', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
-	const menuOptions = ['None', 'History'];
+	const menuOptions = ['None', 'History', 'About'];
 
 	const {
 		state, 
