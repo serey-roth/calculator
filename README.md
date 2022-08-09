@@ -4,7 +4,7 @@ Youtube tutorial by Tyler Potts. Later on, I was inspired by the calculator
 app on my Android phone and decided to add more functionalities to the project,
 as a history database and function support.
 
-[Link](https://serey-roth.github.io/calculator/)
+[Demo](https://serey-roth.github.io/calculator/)
 
 ### Description
 The calculator supports standard arithmetic operations, such as addition,
