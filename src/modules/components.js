@@ -4,6 +4,9 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+
 const ITEM_HEIGHT = 48;
 
 export function LongMenu(props) {
@@ -62,6 +65,9 @@ export function History(props) {
 	return (
 		<div className={props.className}>
 			<div id="head">
+				<button onClick={props.togglePanel}>
+				<FontAwesomeIcon icon={faChevronLeft} />
+				</button>
 				<h3>History</h3>
 				<p onClick={props.onClickClearHistory}>Clear</p>
 			</div>

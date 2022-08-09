@@ -42,6 +42,14 @@ button:hover {
   padding: 16px;
 }
 
+.contents {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 64px rgba(0, 0, 0, 0.2);
+}
+
 .calculator {
   display: flex;
   flex-direction: column;
@@ -50,28 +58,32 @@ button:hover {
   max-width: 400px;
   background-color: var(--dark);
   color: var(--light);
-  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 64px rgba(0, 0, 0, 0.2);
 }
 
 .history {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  padding: 16px;
+  width: 300px;
   background-color: var(--light);
   color: var(--dark);
+  align-self: stretch;
 }
 
 .history #head {
   display: flex;
   flex-direction: row;
-  align-items: middle;
+  gap: 10px;
+  align-items: center;
   width: 100%;
-  background-color: var(--light);
-  color: var(--dark);
-  margin-bottom: 10px;
+  background-color: var(--dark);
+  color: var(--light);
+  padding: 16px;
+}
+
+.history #head button {
+  font-size: 14px;
+  padding: 0;
 }
 
 .history #head h3 {
@@ -87,8 +99,19 @@ button:hover {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: 130px;
+  padding: 0px 16px;
+  max-height: 450px;
   overflow: auto;
+}
+
+@media only screen and (max-width: 400px) {
+  .contents {
+    flex-direction: column;
+  }
+
+  .history {
+    width: 100%;
+  }
 }
 
 .history.open {
