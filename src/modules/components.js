@@ -61,6 +61,23 @@ export function LongMenu(props) {
 	);
 }
 
+function DateGroup(props) {
+	const list = props.list;
+	return (
+		<div className="date-group">
+			<p className="date">{props.date}</p>
+			{list.map((ex, index) => 
+				<div className="expression-result"
+				key={props.date + `_${index}`}>
+					<p className="expression" onClick={props.onClickItem}>{ex.expression}</p>
+					<p className="result" onClick={props.onClickItem}>{ex.result}</p>
+				</div>)
+			}
+		</div>
+	);
+}
+
+
 export function History(props) {
 	return (
 		<div className={props.className}>
@@ -72,9 +89,15 @@ export function History(props) {
 				<p onClick={props.onClickClearHistory}>Clear</p>
 			</div>
 			<div id="main">
-			{props.contents.length > 0 ? 
-				"" : ""
-			}
+				{props.list.length > 0 ? 
+					props.list.map((ex, index) => 
+					<DateGroup 
+					date={ex.date}
+					list={ex.list}
+					key={ex.date}
+					onClickItem={props.onClickHistoryItem}
+					/>) : ''
+				}
 			</div>
 		</div>	
 	);

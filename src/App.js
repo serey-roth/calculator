@@ -118,7 +118,7 @@ function App() {
 		  		</div>
 				<History 
 					className={historyVisible ? "history open" : "history closed"}
-					contents={state.history ? state.history : []}
+					list={state.history.list}
 					onClickHistoryItem={(e) => handleClickHistoryItem(e)}
 					onClickClearHistory={handleClearHistory}
 					togglePanel={toggleHistoryPanel}
