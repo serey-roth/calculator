@@ -73,7 +73,7 @@ function App() {
 		handleAddExpression(item);
 	}
 
-	const aboutText = `Support standard arithmetic operations and various functions. 
+	const aboutText = `Supports standard arithmetic operations and various functions. 
 	Includes data management in the form of a 'history'.`
 	
   	return (
