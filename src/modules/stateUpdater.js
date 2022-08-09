@@ -3,12 +3,11 @@ import {
     binaryOps,
     evaluate,
     removeLastValue,
-    saveHistory,
     addToHistory,
     fillInClosingParen,
 } from "./calculator";
 
-import { History } from "./history";
+import { History, saveHistory } from "./history";
 
 const day = require('dayjs');
 
