@@ -3,7 +3,7 @@ import { useReducer } from "react";
 const math = require('mathjs');
 
 const numbers = ['0', '1', '2', '3', '4', 
-'5', '6', '7', '8', '9', 'exp1', 'π'];
+'5', '6', '7', '8', '9', 'E', 'π'];
 const binaryOps = ['+', '-', '*', '/', '^', '%'];
 const func = ['sqrt', 'exp', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc',
 'sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'ln'];
@@ -34,30 +34,43 @@ export function useCalculator(initialValue) {
         let expr = state.expression;
         switch(action.type) {
             case 'ADD_EXPRESSION':{
+                let disp = state.forDisplay;
+                if (numbers.includes(expr.slice(-1)) || 
+                expr.slice(-1) === ')') {
+                    expr += '*';
+                    disp += '*';
+                }
                 return {
                     ...state,
                     expression: expr + value,
-                    forDisplay: state.forDisplay + value,
+                    forDisplay: disp + value,
                     result: evaluate(state.isDegree, expr + value, '', 
                         state.stack.length, 'CALCULATE'), 
+                    previous: '',
                 };
             }
             case 'ADD_DIGIT': {
+                let disp = state.forDisplay;
                 if (expr.slice(-1) === ')') {
                     expr += '*';
+                    disp += '*';
                 }
                 let newExpr = expr;
-                let newDispl = state.forDisplay;
                 let actionType = 'ADD';
                 if (value === '.') {
+                    if (expr.slice(-1) === '.' ||
+                    expr.slice(-1) === 'E' || 
+                    expr.slice(-1) === 'π') {
+                        return {...state};
+                    }
                     newExpr = expr === '' ? '0' : expr;
-                    newDispl = state.forDisplay === '' ? '0' : state.forDisplay;
+                    disp = state.forDisplay === '' ? '0' : state.forDisplay;
                     actionType = 'CALCULATE';
                 }
                 return {
                     ...state,
                     expression: newExpr + value,
-                    forDisplay: newDispl + value,
+                    forDisplay: disp + value,
                     result: evaluate(state.isDegree, newExpr, value, 
                         state.stack.length, actionType),
                 };
@@ -124,7 +137,7 @@ export function useCalculator(initialValue) {
                 }
             }
             case 'ADD_CONSTANT': {
-                const newValue = value === 'e' ? 'exp1' : value;
+                const newValue = value === 'e' ? 'E' : value;
                 return {
                     ...state,
                     expression: expr + newValue,
@@ -324,8 +337,8 @@ function renderSymbolsForEval(currentExpr) {
     if (/π/gi.test(currentExpr)) {
         currentExpr = currentExpr.replace(/π/gi, math.pi);
     } 
-    if (/exp1/gi.test(currentExpr)) {
-        currentExpr = currentExpr.replace(/exp1/gi, math.exp(1));
+    if (/E/gi.test(currentExpr)) {
+        currentExpr = currentExpr.replace(/E/gi, math.exp(1));
     }
     if (/mod/gi.test(currentExpr)) {
         currentExpr = currentExpr.replace(/mod/gi, '%');
@@ -339,7 +352,7 @@ function renderSymbolsForEval(currentExpr) {
 function evaluate(isDegree, currentExpr, newValue, stackLength, actionType) {
     if (numbers.includes(newValue) || newValue === ')'  || actionType === 'CALCULATE') {
         if (numbers.includes(newValue) && 
-        !(newValue === 'π' || newValue === 'exp1')) {
+        !(newValue === 'π' || newValue === 'E')) {
             newValue = Number.parseInt(newValue);
         }
         if (actionType === 'ADD') {
@@ -373,9 +386,6 @@ function removeLastValue(currentExpr, currentStack, currentDisplay) {
         }
         newStack = currentStack.filter((_, i) => i < currentStack.length - 1);
     } else {
-        if (/exp$/.test(newExpr)) {//this is for the number e which i set as exp1
-            newExpr = newExpr.replace(/exp$/, '');
-        } 
         if (/mo$/.test(newDisplay)) {//this is for mod in display
             newDisplay = newDisplay.replace(/mo$/, '');
         }

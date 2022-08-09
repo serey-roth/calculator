@@ -4,6 +4,8 @@ import {
 	History 
 } from './modules/components'
 import { useCalculator } from './modules/logic';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faDeleteLeft } from '@fortawesome/free-solid-svg-icons'
 
 const digits = Array.from(Array(9), (_, d) => d + 1);
 
@@ -64,15 +66,10 @@ function App() {
 						{state.result ?  <p>({state.result})</p> : ""}					
 					</div>
 					<div className="scientific">
-						<div className="alwaysVisible">
-							<button onClick={() => handleAddConstant('π')}>π</button>	
-							<button onClick={() => handleAddConstant('e')}>e</button>	
-						</div>
-						<div className="drawer">
 						<div className="switchButtons">
-								<button onClick={handleToggleDegree}>{state.isDegree ? 'RAD' :
+							<button onClick={handleToggleDegree}>{state.isDegree ? 'RAD' :
 								'DEG'}</button>
-								<button onClick={handleToggleInverted}>INV</button>
+							<button onClick={handleToggleInverted}>INV</button>
 						</div>
 						<div className="invertible">
 							{state.isInverted ? 
@@ -85,8 +82,8 @@ function App() {
 									<button 
 									key={e}
 									onClick={() => handleAddFunction(e)}>{e}</button>	
-									)}
-						</div>
+									)
+								}
 						</div>
 					</div>
 					<div className="standard">
@@ -97,8 +94,12 @@ function App() {
 								key={d}>{d}</button>
 							)}
 							<button onClick={() => handleAddDigit("0")}>0</button>
+							<button onClick={() => handleAddConstant('π')}>π</button>	
+							<button onClick={() => handleAddConstant('e')}>e</button>	
 							<button onClick={() => handleAddDigit(".")}>.</button>
-							<button onClick={handleDeleteLast}>DEL</button>
+							<button  id="del" onClick={handleDeleteLast}>
+							<FontAwesomeIcon icon={faDeleteLeft} />
+							</button>
 						</div>
 						<div className="operators">
 							<button onClick={() => handleAddBinaryOperator("+")}>+</button>

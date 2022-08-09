@@ -179,31 +179,13 @@ button:hover {
 
 .scientific {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   width: 100%;
 }
 
 .scientific button:hover {
   background-color: var(--secondary);
 }
-
-.alwaysVisible {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.alwaysVisible button {
-  flex: 1 1 auto;
-  background-color: inherit;
-  color: inherit;
-}
-
-.drawer {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-}
-
 
 .switchButtons {
   display: flex;
@@ -226,28 +208,31 @@ button:hover {
 
 .standard {
   display: flex;
-  flex-direction: row;
+}
+
+.standard #del {
+  padding: 0;
 }
 
 .operators {
   display: flex;
+  flex: 1 1 30%;
   flex-wrap: wrap;
-  flex-grow: 1;
   background-color: var(--secondary);
 }
 
 .operators button {
-  flex: 2 1 33.334%;
+  flex: 1 1 33.334%;
   font-weight: 700;
 }
 
 .digits {
   display: flex;
+  flex: 1 1 70%;
   flex-wrap: wrap;
-  flex-grow: 1;
   background-color: var(--primary);
 }
 
 .digits button {
-  flex: 1 33.334%;
+  flex: 1 1 33.334%;
 }
