@@ -126,15 +126,20 @@ export function addFunction(state, value) {
         }
     }
 }
+
 export function addConstant(state, value) {
     const newValue = value === 'e' ? 'E' : value;
-    return {
-        ...state,
-        expression: state.expression + newValue,
-        forDisplay: state.forDisplay + value,
-        result: evaluate(state.isDegree, state.expression, 
-            newValue, state.stack.length, 'ADD'),
-    };
+    if (state.expression.slice(-1) === '.') {
+        return {...state};
+    } else {
+        return {
+            ...state,
+            expression: state.expression + newValue,
+            forDisplay: state.forDisplay + value,
+            result: evaluate(state.isDegree, state.expression, 
+                newValue, state.stack.length, 'ADD'),
+        };
+    }
 }
 
 export function addParenthesis(state, value) {

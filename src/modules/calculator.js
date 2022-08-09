@@ -165,7 +165,7 @@ function renderSymbolsForEval(currentExpr) {
     if (/π/gi.test(currentExpr)) {
         currentExpr = currentExpr.replace(/π/gi, math.pi);
     } 
-    if (/E/gi.test(currentExpr)) {
+    if (/E/g.test(currentExpr)) {
         currentExpr = currentExpr.replace(/E/gi, math.exp(1));
     }
     if (/mod/gi.test(currentExpr)) {
