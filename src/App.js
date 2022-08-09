@@ -4,7 +4,7 @@ import {
 	History,
 	About 
 } from './modules/components'
-import { useCalculator } from './modules/logic';
+import { useCalculator } from './modules/calculator';
 import { loadHistory } from './modules/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDeleteLeft } from '@fortawesome/free-solid-svg-icons'
@@ -15,6 +15,8 @@ function App() {
 	const fn = ['√', 'e^x', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
 	const fnInv = ['x^2', 'ln', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
 	const menuOptions = ['None', 'History', 'About'];
+	const aboutText = `Supports standard arithmetic operations and various functions. 
+	Includes data management in the form of a 'history'.`;
 
 	const {
 		state, 
@@ -72,9 +74,6 @@ function App() {
 		const item = e.target.textContent;
 		handleAddExpression(item);
 	}
-
-	const aboutText = `Supports standard arithmetic operations and various functions. 
-	Includes data management in the form of a 'history'.`
 	
   	return (
       	<div className="app"> 
