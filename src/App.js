@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { 
 	LongMenu, 
-	History 
+	History,
+	About 
 } from './modules/components'
 import { useCalculator } from './modules/logic';
 import { loadHistory } from './modules/history';
@@ -40,16 +41,40 @@ function App() {
         isInverted: false,
 	});
 
-	const [historyVisible, setHistoryVisible] = useState(false);
+	const [panels, setVisible] = useState({
+		history: false,
+		about: false,
+	});
 
 	const toggleHistoryPanel = () => {
-		setHistoryVisible(!historyVisible);
+		setVisible(function(prevState) {
+			let aboutState = prevState.about ? !prevState.about 
+			: prevState.about;
+			return {
+				history: !prevState.history,
+				about: aboutState,
+			}
+		});
+	}
+
+	const toggleAboutPanel = () => {
+		setVisible(function(prevState) {
+			let historyState = prevState.history ? !prevState.history 
+			: prevState.history;
+			return {
+				history: historyState,
+				about: !prevState.about,
+			}
+		});
 	}
 
 	const handleClickHistoryItem = (e) => {
 		const item = e.target.textContent;
 		handleAddExpression(item);
 	}
+
+	const aboutText = `Support standard arithmetic operations and various functions. 
+	Includes data management in the form of a 'history'.`
 	
   	return (
       	<div className="app"> 
@@ -60,7 +85,8 @@ function App() {
 						<LongMenu 
 						id="menu"
 						options={menuOptions} 
-						onClickHistoryPanel={() => toggleHistoryPanel()}/>
+						onClickHistoryPanel={() => toggleHistoryPanel()}
+						onClickAboutPanel={() => toggleAboutPanel()}/>
 					</div>
 					<div className="display">
 						<p>{state.forDisplay || ""}</p>
@@ -116,13 +142,22 @@ function App() {
 						</div>
 					</div>
 		  		</div>
+				<About
+					className={panels.about ? "about open" : "about closed"}
+					text={aboutText}
+					year={2022}
+					author='Serey Roth'
+					source_link={'https://github.com/serey-roth/calculator'}
+					togglePanel={toggleAboutPanel}
+				/>
 				<History 
-					className={historyVisible ? "history open" : "history closed"}
+					className={panels.history ? "history open" : "history closed"}
 					list={state.history.list}
 					onClickHistoryItem={(e) => handleClickHistoryItem(e)}
 					onClickClearHistory={handleClearHistory}
 					togglePanel={toggleHistoryPanel}
 				/>
+				
 			</div>
       	</div>
   	);

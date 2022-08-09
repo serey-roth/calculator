@@ -20,6 +20,8 @@ export function LongMenu(props) {
 	const handleClose = (e) => {
 		if (e.target.innerText === 'History') {
 			props.onClickHistoryPanel();
+		} else if (e.target.innerText === 'About') {
+			props.onClickAboutPanel();
 		}
 		setAnchorEl(null);
 	};
@@ -82,14 +84,14 @@ function DateGroup(props) {
 export function History(props) {
 	return (
 		<div className={props.className}>
-			<div id="head">
+			<div className="head">
 				<button onClick={props.togglePanel}>
 				<FontAwesomeIcon icon={faChevronLeft} />
 				</button>
 				<h3>History</h3>
 				<p onClick={props.onClickClearHistory}>Clear</p>
 			</div>
-			<div id="main">
+			<div className="main">
 				{props.list.length > 0 ? 
 					props.list.map((ex, index) => 
 					<DateGroup 
@@ -99,6 +101,26 @@ export function History(props) {
 					onClickItem={props.onClickHistoryItem}
 					/>) : ''
 				}
+			</div>
+		</div>	
+	);
+}
+
+export function About(props) {
+	return (
+		<div className={props.className}>
+			<div className="head">
+				<button onClick={props.togglePanel}>
+				<FontAwesomeIcon icon={faChevronLeft} />
+				</button>
+				<h3>About</h3>
+			</div>
+			<div className="main">
+				<p>{props.text}</p>
+				<p className='footer'>
+				Copyright &copy; {props.year} {props.author}&nbsp;
+				<a href={props.source_link} target="_blank" rel="noreferrer">Source</a>
+				</p>
 			</div>
 		</div>	
 	);

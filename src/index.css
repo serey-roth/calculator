@@ -61,7 +61,7 @@ button:hover {
   overflow: hidden;
 }
 
-.history {
+.history, .about {
   display: flex;
   flex-direction: column;
   width: 300px;
@@ -70,7 +70,8 @@ button:hover {
   align-self: stretch;
 }
 
-.history #head {
+.history .head, 
+.about .head {
   display: flex;
   flex-direction: row;
   gap: 10px;
@@ -81,45 +82,61 @@ button:hover {
   padding: 16px;
 }
 
-.history #head button {
+.history .head button,
+.about .head button {
   font-size: 14px;
   padding: 0;
 }
 
-.history #head h3 {
+.history .head h3,
+.about .head h3 {
   font-size: 16px;
   flex-grow: 2;
 }
 
-.history #head p {
+.history .head p {
   cursor: pointer;
 }
 
-.history #main {
+.history .main, 
+.about .main {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 0px 16px;
+  padding: 5px 16px;
   max-height: 450px;
   overflow: auto;
 }
+
 
 @media only screen and (max-width: 400px) {
   .contents {
     flex-direction: column;
   }
 
-  .history {
+  .history, 
+  .about {
     width: 100%;
   }
 }
 
-.history.open {
+.history.open,
+.about.open {
   display: block;
 }
 
-.history.closed {
+.history.closed,
+.about.closed {
   display: none;
+}
+
+.about a {
+  text-decoration: none;
+  color: var(--secondary);
+}
+
+.about .footer {
+  padding-top: 20px;
 }
 
 .date-group {
@@ -147,8 +164,6 @@ button:hover {
 .expression-result p {
   align-self: flex-end;
 }
-
-
 
 .expression-result .result::before {
   content: '> ';
