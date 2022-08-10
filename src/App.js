@@ -1,21 +1,30 @@
 import { useState } from 'react';
 import { 
+	ComboBox,
 	LongMenu, 
 	History,
-	About 
+	About,
+	NumberPad,
+	OperatorPad,
+	Scientific,
+	Unit,
 } from './modules/components'
 import { useCalculator } from './modules/calculator';
 import { loadHistory } from './modules/history';
+import { 
+	getCategories,
+	//getUnits,
+	//useConverter 
+} from './modules/units';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDeleteLeft } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 
 const digits = Array.from(Array(9), (_, d) => d + 1);
 
-
-function App() {
+export default function App() {
 	const fn = ['√', 'e^x', 'sin', 'cos', 'tan', 'cot', 'sec', 'csc'];
 	const fnInv = ['x^2', 'ln', 'asin', 'acos', 'atan', 'acot', 'asec', 'acsc'];
-	const menuOptions = ['None', 'History', 'About'];
+	const menuOptions = ['None', 'Unit Converter','History', 'About'];
 	const aboutText = `Supports standard arithmetic operations and various functions. 
 	Includes data management in the form of a 'history'.`;
 
@@ -44,10 +53,45 @@ function App() {
         isInverted: false,
 	});
 
+	/* const {
+		converter,
+		convert, 
+		changeToUnit,
+		changeFromUnit,
+	} = useConverter({
+		value: '',
+		category: '',
+		from: '',
+		to: '',
+		result: ''
+	})  */
+
 	const [panels, setVisible] = useState({
+		default: true,
+		converter: false,
 		history: false,
 		about: false,
 	});
+
+	const toggleDefault = () => {
+		setVisible(function(prevState) {
+			return {
+				...prevState,
+				default: true,
+				converter: false,
+			}
+		});
+	}
+
+	const toggleConverter = () => {
+		setVisible(function(prevState) {
+			return {
+				...prevState,
+				default: !prevState.default,
+				converter: !prevState.converter,
+			}
+		})
+	}
 
 	const toggleHistoryPanel = () => {
 		setVisible(function(prevState) {
@@ -81,65 +125,85 @@ function App() {
 			<div className="contents">
 				<div className="calculator">
 					<div className="top">
-						<h3>{state.isDegree ? 'DEG' : 'RAD'}</h3>
+						{panels.default ? 
+							<h3>{state.isDegree ? 'DEG' : 'RAD'}</h3> :
+							<div id="topConverter">
+							<button onClick={() => toggleDefault()}>
+								<FontAwesomeIcon icon={faChevronLeft} />
+							</button>
+							<h3>Unit Converter</h3>
+							</div>
+							
+						}
 						<LongMenu 
 						id="menu"
 						options={menuOptions} 
+						onClickDefault={() => toggleDefault()}
+						onClickConverter={() => toggleConverter()}
 						onClickHistoryPanel={() => toggleHistoryPanel()}
 						onClickAboutPanel={() => toggleAboutPanel()}/>
 					</div>
-					<div className="display">
-						<p>{state.forDisplay || ""}</p>
-						{state.result ?  <p>({state.result})</p> : ""}					
-					</div>
-					<div className="scientific">
-						<div className="switchButtons">
-							<button onClick={handleToggleDegree}>{state.isDegree ? 'RAD' :
-								'DEG'}</button>
-							<button onClick={handleToggleInverted}>INV</button>
+					<div className={panels.default ? 
+							'default active' : 
+							'default inactive'}>
+						<div className="display">
+							<p>{state.forDisplay || ""}</p>
+							{state.result ?  <p>({state.result})</p> : ""}					
 						</div>
-						<div className="invertible">
-							{state.isInverted ? 
-								fnInv.map(e => 
-									<button 
-									key={e}
-									onClick={() => handleAddFunction(e)}>{e}</button>	
-									) : 
-								fn.map(e => 
-									<button 
-									key={e}
-									onClick={() => handleAddFunction(e)}>{e}</button>	
-									)
+						<Scientific 
+							className='scientific'
+							childClass={
+								{
+									toggleButtons: 'toggleButtons',
+									functions: 'functions',
 								}
+							}
+							unit={state.isDegree ? 'RAD' : 'DEG'}
+							functions={state.isInverted ? fnInv : fn}
+							handleToggleDegree={handleToggleDegree}
+							handleToggleInverted={handleToggleInverted}
+							handleAddFunction={handleAddFunction}
+						/>
+					</div>
+					<div className={panels.converter ? 
+							'converter active' : 
+							'converter inactive'}>
+						<div className="categories">
+							<ComboBox
+								options={getCategories()}
+								label='Categories'
+							/>
 						</div>
+						<Unit 
+							className='from'
+							label='From'
+							options={getCategories()}
+							value={1} 
+						/>
+						<Unit 
+							className='to'
+							label='To'
+							options={getCategories()}
+							value={1} 
+						/>
 					</div>
 					<div className="standard">
-						<div className="digits">
-							{digits.map(d => 
-								<button
-								onClick={() => handleAddDigit(d.toString())}
-								key={d}>{d}</button>
-							)}
-							<button onClick={() => handleAddDigit("0")}>0</button>
-							<button onClick={() => handleAddConstant('π')}>π</button>	
-							<button onClick={() => handleAddConstant('e')}>e</button>	
-							<button onClick={() => handleAddDigit(".")}>.</button>
-							<button  id="del" onClick={handleDeleteLast}>
-							<FontAwesomeIcon icon={faDeleteLeft} />
-							</button>
-						</div>
-						<div className="operators">
-							<button onClick={() => handleAddBinaryOperator("+")}>+</button>
-							<button onClick={() => handleAddBinaryOperator("-")}>-</button>
-							<button onClick={() => handleAddBinaryOperator("*")}>&times;</button>
-							<button onClick={() => handleAddBinaryOperator("÷")}>&divide;</button>
-							<button onClick={() => handleAddParenthesis('(')}>(</button>
-							<button onClick={() => handleAddParenthesis(')')}>)</button>
-							<button onClick={() => handleAddBinaryOperator('^')}>^</button>
-							<button onClick={() => handleAddBinaryOperator('mod')}>mod</button>
-							<button onClick={handleCalculation}>=</button>
-							<button onClick={handleResetCalculator}>AC</button>
-						</div>
+						<NumberPad 
+							className='digits'
+							digits={digits}
+							handleAddDigit={handleAddDigit}
+							handleAddConstant={handleAddConstant}
+							handleDeleteLast={handleDeleteLast}
+						/>
+						<OperatorPad
+							className={panels.default ? 
+								'operators active' : 
+								'operators inactive'}
+							handleAddBinary={handleAddBinaryOperator}
+							handleAddParenthesis={handleAddParenthesis}
+							handleCalculation={handleCalculation}
+							handleResetCalculator={handleResetCalculator}
+						/>
 					</div>
 		  		</div>
 				<About
@@ -157,12 +221,10 @@ function App() {
 					onClickClearHistory={handleClearHistory}
 					togglePanel={toggleHistoryPanel}
 				/>
-				
 			</div>
       	</div>
   	);
 }
 
-export default App;
 
 

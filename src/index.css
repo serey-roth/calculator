@@ -61,6 +61,7 @@ button:hover {
   overflow: hidden;
 }
 
+/* History and About */
 .history, .about {
   display: flex;
   flex-direction: column;
@@ -106,18 +107,6 @@ button:hover {
   padding: 5px 16px;
   max-height: 450px;
   overflow: auto;
-}
-
-
-@media only screen and (max-width: 400px) {
-  .contents {
-    flex-direction: column;
-  }
-
-  .history, 
-  .about {
-    width: 100%;
-  }
 }
 
 .history.open,
@@ -169,17 +158,45 @@ button:hover {
   content: '> ';
 }
 
+/* Top */
 .top {
   display: flex;
   flex-direction: row;
   width: 100%;
   height: 50px;
   align-items: center;
+  padding-left: 15px;
 }
 
 .top h3 {
   flex-grow: 2;
-  padding-left: 15px;
+}
+
+.top button {
+  padding: 0px;
+
+}
+
+#topConverter {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+  flex-grow: 2;
+}
+
+/* Default */
+.default.active {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  background-color: inherit;
+  color: inherit;
+}
+
+.default.inactive {
+  display: none;
 }
 
 #menu {
@@ -223,22 +240,22 @@ button:hover {
   background-color: var(--secondary);
 }
 
-.switchButtons {
+.toggleButtons {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
 }
 
-.switchButtons button {
+.toggleButtons button {
   flex: 2 1 auto;
 }
 
-.invertible {
+.functions {
   display: flex;
   flex-wrap: wrap;
 }
 
-.invertible button {
+.functions button {
   flex: 1 2 25%;  
 }
 
@@ -257,6 +274,14 @@ button:hover {
   background-color: var(--secondary);
 }
 
+.operators.active {
+  pointer-events: all;
+}
+
+.operators.inactive {
+  pointer-events: none;
+}
+
 .operators button {
   flex: 1 1 33.334%;
   font-weight: 700;
@@ -271,4 +296,44 @@ button:hover {
 
 .digits button {
   flex: 1 1 33.334%;
+}
+
+/* Converter */
+.converter.active {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background-color: var(--light);
+  color: var(--dark);
+  padding: 15px;
+}
+
+.converter.inactive {
+  display: none;
+}
+
+.from, .to {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.from .combo-box,
+.to .combo-box {
+  flex-grow: 3;
+}
+
+@media only screen and (max-width: 400px) {
+  .contents {
+    flex-direction: column;
+  }
+
+  .history, 
+  .about {
+    width: 100%;
+  }
 }

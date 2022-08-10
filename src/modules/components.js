@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { faDeleteLeft, faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 
 const ITEM_HEIGHT = 48;
 
@@ -17,9 +17,8 @@ export function ComboBox(props) {
 	return (
 		<Autocomplete
 			disablePortal
-			className={props.className}
+			className='combo-box'
 			options={props.options}
-			sx={{ width: 300 }}
 			renderInput={(params) => 
 				<TextField {...params} label={props.label} />
 			}
@@ -33,10 +32,15 @@ export function LongMenu(props) {
 		setAnchorEl(event.currentTarget);
 	};
 	const handleClose = (e) => {
-		if (e.target.innerText === 'History') {
+		if (e.target.innerText === 'Unit Converter') {
+			props.onClickConverter();
+		}
+		else if (e.target.innerText === 'History') {
 			props.onClickHistoryPanel();
 		} else if (e.target.innerText === 'About') {
 			props.onClickAboutPanel();
+		} else {
+			props.onClickDefault();
 		}
 		setAnchorEl(null);
 	};
@@ -138,6 +142,75 @@ export function About(props) {
 				</p>
 			</div>
 		</div>	
+	);
+}
+
+export function NumberPad(props) {
+	return (
+		<div className={props.className}>
+			{props.digits.map(d => 
+				<button
+				onClick={() => props.handleAddDigit(d.toString())}
+				key={d}>{d}</button>
+			)}
+			<button onClick={() => props.handleAddDigit("0")}>0</button>
+			<button onClick={() => props.handleAddConstant('π')}>π</button>	
+			<button onClick={() => props.handleAddConstant('e')}>e</button>	
+			<button onClick={() => props.handleAddDigit(".")}>.</button>
+			<button  id="del" onClick={props.handleDeleteLast}>
+			<FontAwesomeIcon icon={faDeleteLeft} />
+			</button>
+		</div>
+	);
+}
+
+export function OperatorPad(props) {
+	return (
+		<div className={props.className}>
+			<button onClick={() => props.handleAddBinary("+")}>+</button>
+			<button onClick={() => props.handleAddBinary("-")}>-</button>
+			<button onClick={() => props.handleAddBinary("x")}>&times;</button>
+			<button onClick={() => props.handleAddBinary("÷")}>&divide;</button>
+			<button onClick={() => props.handleAddParenthesis('(')}>(</button>
+			<button onClick={() => props.handleAddParenthesis(')')}>)</button>
+			<button onClick={() => props.handleAddBinary('^')}>^</button>
+			<button onClick={() => props.handleAddBinary('mod')}>mod</button>
+			<button onClick={props.handleCalculation}>=</button>
+			<button onClick={props.handleResetCalculator}>AC</button>
+		</div>
+	);
+}
+
+export function Scientific(props) {
+	return (
+		<div className={props.className}>
+			<div className={props.childClass.toggleButtons}>
+				<button onClick={props.handleToggleDegree}>{props.unit}</button>
+				<button onClick={props.handleToggleInverted}>INV</button>
+			</div>
+			<div className={props.childClass.functions}>
+				{props.functions.map(e => 
+					<button 
+						key={e}
+						onClick={() => props.handleAddFunction(e)}>{e}</button>	
+					) 
+				}
+			</div>
+		</div>
+	);
+}
+
+export function Unit(props) {
+	return (
+		<div className={props.className}>
+			<TextField 
+				className='text-field'
+				value={props.value} />
+			<ComboBox 
+				options={props.options}
+				label={props.label}
+			/>
+		</div>
 	);
 }
 

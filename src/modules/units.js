@@ -138,7 +138,7 @@ export function getUnits(category) {
     return Object.values(UNITS[category])
 }  
 
-export function useUnitConverter(initialValue) {
+export function useConverter(initialValue) {
     const [converter, updateConverter] = useState(initialValue);
 
     const convert = (value, category, from, to) => {

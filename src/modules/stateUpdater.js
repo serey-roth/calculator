@@ -62,7 +62,8 @@ export function addDigit(state, value) {
 export function addBinary(state, value) {
     let expr = state.expression;
     let newValue = value === 'mod' ? '%' :
-        (value === '÷' ? '/' : value);
+        (value === '÷' ? '/' : 
+        (value === 'x' ? '*' : value));
     const invalid = (expr === '' ||
         binaryOps.includes(expr.slice(-1)) ||
         expr.slice(-1) === '(');
