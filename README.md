@@ -4,7 +4,7 @@ Youtube tutorial by Tyler Potts. Later on, I was inspired by the calculator
 app on my Android phone and decided to add more functionalities to the project,
 as a history database and function support.
 
-[Demo](https://serey-roth.github.io/calculator/)
+[Demo](https://serey-roth-calculator.netlify.app/)
 
 <img width="706" alt="Screen Shot 2022-08-09 at 4 16 07 PM" src="https://user-images.githubusercontent.com/88986106/183778585-34b35b1a-3ff1-4882-ab1d-9da11b1c1f22.png"><img width="654" alt="Screen Shot 2022-08-09 at 4 16 38 PM" src="https://user-images.githubusercontent.com/88986106/183778588-526e9622-da71-404b-bfd2-9d698a94b9c4.png">
 
