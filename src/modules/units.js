@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const UNITS = {
     'length': {
         'kilometer': 'km',
@@ -126,10 +128,51 @@ const UNITS = {
     }
 }
 
+const math = require('mathjs');
+
 export function getCategories() {
     return Object.keys(UNITS);
 }
 
 export function getUnits(category) {
     return Object.values(UNITS[category])
+}  
+
+export function useUnitConverter(initialValue) {
+    const [converter, updateConverter] = useState(initialValue);
+
+    const convert = (value, category, from, to) => {
+        updateConverter(prevState => ({
+                ...prevState,
+                value: value,
+                category: category,
+                from: from,
+                to: to,
+                result: math.evaluate(`${value} ${from} to ${to}`),
+            })
+        );
+    }
+
+    const changeFromUnit = (from) => {
+        updateConverter(prevState => ({
+            ...prevState,
+            from: from,
+            result: math.evaluate(`${prevState.value} ${from} to ${prevState.to}`),
+        }));
+    }
+
+    const changeToUnit = (to) => {
+        updateConverter(prevState => ({
+            ...prevState,
+            to: to,
+            result: math.evaluate(`${prevState.value} ${prevState.from} to ${to}`),
+        }));
+    }
+
+    return {
+        converter,
+        convert,
+        changeToUnit,
+        changeFromUnit,
+    }
 }
