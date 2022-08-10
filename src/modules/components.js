@@ -3,6 +3,8 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
@@ -10,6 +12,19 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 const ITEM_HEIGHT = 48;
 
 const dayjs = require('dayjs');
+
+export function ComboBox(props) {
+	return (
+		<Autocomplete
+			disablePortal
+			className={props.className}
+			options={props.options}
+			sx={{ width: 300 }}
+			renderInput={(params) => 
+				<TextField {...params} label={props.label} />
+			}
+		/>);
+}
 
 export function LongMenu(props) {
 	const [anchorEl, setAnchorEl] = useState(null);
