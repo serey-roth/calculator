@@ -37,11 +37,9 @@ I used ReactJS as my framework, MathJS for evaluating expressions, DayJS for tim
 the menu component.
 
 ### Future Plans 
-#### Version 1.0:
-I plan on integrating unit conversion into the app and I want to replace some 
+* Version 1.0: I plan on integrating unit conversion into the app and I want to replace some 
 of the components with those from MaterialUI. 
-#### Version 1.1:
-I want to replace the main components of the calculator such as the number and
+* Version 1.1: I want to replace the main components of the calculator such as the number and
 operator pad, the side panels and the functions pad with components from MUI.
 I also want to clean up the styling with Sass or try out Tailwind CSS.
 
