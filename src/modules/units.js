@@ -231,9 +231,14 @@ export function useConverter(initialValue) {
 
     const handleCategoryChange = (category) => { 
         updateConverter(prevState => ({
-            ...prevState,
             category: category,
             units: UNITS[category],
+            toLabel: '',
+            to: '',
+            from: '',
+            fromLabel: '',
+            value: '',
+            result: '',
         }));
     }
 
