@@ -13,8 +13,7 @@ import { useCalculator } from './modules/calculator';
 import { loadHistory } from './modules/history';
 import { 
 	getCategories,
-	//getUnits,
-	//useConverter 
+	useConverter 
 } from './modules/units';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
@@ -53,18 +52,23 @@ export default function App() {
         isInverted: false,
 	});
 
-	/* const {
+	const {
 		converter,
-		convert, 
 		changeToUnit,
 		changeFromUnit,
+		addDigit,
+		deleteDigit,
+		handleCategoryChange
 	} = useConverter({
 		value: '',
 		category: '',
+		units: [],
+		fromLabel: '',
+		toLabel: '',
 		from: '',
 		to: '',
 		result: ''
-	})  */
+	})  
 
 	const [panels, setVisible] = useState({
 		default: true,
@@ -98,6 +102,7 @@ export default function App() {
 			let aboutState = prevState.about ? !prevState.about 
 			: prevState.about;
 			return {
+				...prevState,
 				history: !prevState.history,
 				about: aboutState,
 			}
@@ -109,6 +114,7 @@ export default function App() {
 			let historyState = prevState.history ? !prevState.history 
 			: prevState.history;
 			return {
+				...prevState,
 				history: historyState,
 				about: !prevState.about,
 			}
@@ -172,28 +178,37 @@ export default function App() {
 							<ComboBox
 								options={getCategories()}
 								label='Categories'
+								value={converter.category}
+								handleChange={handleCategoryChange}
 							/>
 						</div>
 						<Unit 
 							className='from'
 							label='From'
-							options={getCategories()}
-							value={1} 
+							options={Object.keys(converter.units)}
+							value={converter.value} 
+							unit={converter.fromLabel}
+							handleChange={changeFromUnit}
 						/>
 						<Unit 
 							className='to'
 							label='To'
-							options={getCategories()}
-							value={1} 
+							options={Object.keys(converter.units)}
+							value={converter.result} 
+							unit={converter.toLabel}
+							handleChange={changeToUnit}
 						/>
 					</div>
 					<div className="standard">
 						<NumberPad 
 							className='digits'
 							digits={digits}
-							handleAddDigit={handleAddDigit}
-							handleAddConstant={handleAddConstant}
-							handleDeleteLast={handleDeleteLast}
+							handleAddDigit={panels.default ? 
+								handleAddDigit : addDigit}
+							handleAddConstant={panels.default ?
+								handleAddConstant : () => {return;}}
+							handleDeleteLast={panels.default ?
+								handleDeleteLast : deleteDigit}
 						/>
 						<OperatorPad
 							className={panels.default ? 

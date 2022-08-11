@@ -13,7 +13,7 @@ import {
     toggleInverted,
     toggleDegree,
     deleteLast,
-} from "./stateUpdater"
+} from "./calculatorUpdate"
 
 const math = require('mathjs');
 

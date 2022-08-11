@@ -34,6 +34,11 @@ button:hover {
 	filter: brightness(90%);
 }
 
+h3 {
+  font-size: 16px;
+  flex-grow: 2;
+}
+
 .app {
   display: flex;
   align-items: center;
@@ -78,21 +83,17 @@ button:hover {
   gap: 10px;
   align-items: center;
   width: 100%;
+  height: 50px;
   background-color: var(--dark);
   color: var(--light);
   padding: 16px;
 }
 
 .history .head button,
-.about .head button {
+.about .head button, 
+.top button {
   font-size: 14px;
   padding: 0;
-}
-
-.history .head h3,
-.about .head h3 {
-  font-size: 16px;
-  flex-grow: 2;
 }
 
 .history .head p {
@@ -165,11 +166,7 @@ button:hover {
   width: 100%;
   height: 50px;
   align-items: center;
-  padding-left: 15px;
-}
-
-.top h3 {
-  flex-grow: 2;
+  padding: 16px 0px 16px 16px;
 }
 
 .top button {

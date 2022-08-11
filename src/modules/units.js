@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { numbers } from './calculator';
 
 const UNITS = {
     'length': {
@@ -134,45 +135,115 @@ export function getCategories() {
     return Object.keys(UNITS);
 }
 
-export function getUnits(category) {
-    return Object.values(UNITS[category])
-}  
-
+function removeUnitsFromStringRep(result) {
+    return result.replace(/ .+/g, '');
+}
 export function useConverter(initialValue) {
     const [converter, updateConverter] = useState(initialValue);
 
-    const convert = (value, category, from, to) => {
-        updateConverter(prevState => ({
+    const addDigit = (value) => {
+        updateConverter(function(prevState) {
+            if (value === '.' && !numbers.includes(prevState.value.slice(-1))) {
+                return {...prevState};
+            }
+            let newValue = prevState.value + value;
+            let newResult = prevState.result;
+            if (!(prevState.to === '' || prevState.from === '')) {
+                newResult = removeUnitsFromStringRep(math.evaluate(
+                    `${newValue} ${prevState.from} to ${prevState.to}`).toString());
+            }
+            return {
                 ...prevState,
-                value: value,
-                category: category,
-                from: from,
-                to: to,
-                result: math.evaluate(`${value} ${from} to ${to}`),
-            })
-        );
+                value: newValue,
+                result: newResult,
+            }
+        });
+    }
+
+    const deleteDigit = () => {
+        updateConverter(function(prevState) {
+            let newValue = prevState.value.slice(0, -1);
+            let newResult = prevState.result;
+            if (!(newValue === '' || 
+            prevState.to === '' || prevState.from === '')) {
+                newResult = removeUnitsFromStringRep(math.evaluate(
+                    `${newValue} ${prevState.from} to ${prevState.to}`).toString());
+            } else if (newValue === '') {
+                newResult = '';
+            }
+            return {
+                ...prevState,
+                value: newValue,
+                result: newResult,
+            }
+        });
     }
 
     const changeFromUnit = (from) => {
-        updateConverter(prevState => ({
-            ...prevState,
-            from: from,
-            result: math.evaluate(`${prevState.value} ${from} to ${prevState.to}`),
-        }));
+        updateConverter(function(prevState) {
+            const newUnit = UNITS[prevState.category][from];
+            let newTo = prevState.to;
+            let newToLabel = prevState.toLabel;
+            if (newUnit === prevState.to) {
+                newTo = prevState.from;
+                newToLabel = prevState.fromLabel;
+            }
+            let newResult = prevState.result;
+            if (!(prevState.value === '' || prevState.to === '')) {
+                newResult = removeUnitsFromStringRep(math.evaluate(
+                    `${prevState.value} ${newUnit} to ${newTo}`).toString());
+            }
+            return {
+                ...prevState,
+                fromLabel: from,
+                from: newUnit,
+                toLabel: newToLabel,
+                to: newTo,
+                result: newResult,
+            }
+        });
     }
 
     const changeToUnit = (to) => {
+        updateConverter(function(prevState) {
+            const newUnit = UNITS[prevState.category][to];
+            let newFrom = prevState.from;
+            let newFromLabel = prevState.fromLabel;
+            if (newUnit === prevState.from) {
+                newFrom = prevState.to;
+                newFromLabel = prevState.toLabel;
+            }
+            let newResult = prevState.result;
+            if (!(prevState.value === '' || prevState.from === '')) {
+                newResult = removeUnitsFromStringRep(math.evaluate(
+                    `${prevState.value} ${newFrom} to ${newUnit}`).toString());
+            }            
+            return {
+                ...prevState,
+                fromLabel: newFromLabel,
+                from: newFrom,
+                toLabel: to,
+                to: newUnit,
+                result: newResult,
+            }
+        });
+    }
+
+    const handleCategoryChange = (category) => { 
         updateConverter(prevState => ({
             ...prevState,
-            to: to,
-            result: math.evaluate(`${prevState.value} ${prevState.from} to ${to}`),
+            category: category,
+            units: UNITS[category],
         }));
     }
 
     return {
         converter,
-        convert,
         changeToUnit,
         changeFromUnit,
+        addDigit,
+        deleteDigit,
+        handleCategoryChange,
     }
 }
+

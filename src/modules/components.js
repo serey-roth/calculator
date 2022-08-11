@@ -17,11 +17,15 @@ export function ComboBox(props) {
 	return (
 		<Autocomplete
 			disablePortal
+			disableClearable
+			clearOnEscape
 			className='combo-box'
 			options={props.options}
 			renderInput={(params) => 
 				<TextField {...params} label={props.label} />
 			}
+			value={props.value === '' ? null	: props.value}
+			onChange={(event, newValue) => props.handleChange(newValue)}
 		/>);
 }
 
@@ -209,6 +213,8 @@ export function Unit(props) {
 			<ComboBox 
 				options={props.options}
 				label={props.label}
+				value={props.unit}
+				handleChange={props.handleChange}
 			/>
 		</div>
 	);
